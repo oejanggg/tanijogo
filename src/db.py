@@ -10,7 +10,6 @@ def get_supabase_client() -> Optional[Client]:
     key = os.getenv("SUPABASE_KEY")
 
     if not url or not key or "your-project" in url:
-        print("⚠️ Supabase credentials not fully configured in .env (waiting for SUPABASE_URL)")
         return None
 
     return create_client(url, key)
@@ -26,44 +25,54 @@ def save_receipt_evaluation(
     if not client:
         return {"status": "skipped", "reason": "Supabase credentials incomplete"}
 
-    # 1. Insert into receipts table
-    receipt_payload = {
-        "merchant_name": evaluation.merchant_name,
-        "image_url": image_url,
-        "image_quality_score": evaluation.image_quality_score,
-        "is_original_receipt": evaluation.is_original_receipt,
-        "primary_category": evaluation.primary_receipt_category,
-        "total_amount_idr": evaluation.total_amount_idr,
-        "reward_payout_idr": payout_idr,
-        "fraud_flags": evaluation.fraud_flags,
-        "receipt_summary": evaluation.receipt_summary,
-    }
-
-    response = client.table("receipts").insert(receipt_payload).execute()
-    inserted_receipts = response.data
-
-    if not inserted_receipts:
-        raise RuntimeError("Failed to insert receipt into Supabase.")
-
-    receipt_id = inserted_receipts[0]["id"]
-
-    # 2. Insert line items
-    line_items_payload = [
-        {
-            "receipt_id": receipt_id,
-            "item_name": item.item_name,
-            "amount_idr": item.amount_idr,
-            "classification": item.classification,
-            "confidence_reasoning": item.confidence_reasoning,
+    try:
+        # 1. Insert into receipts table
+        receipt_payload = {
+            "merchant_name": evaluation.merchant_name,
+            "image_url": image_url,
+            "image_quality_score": evaluation.image_quality_score,
+            "is_original_receipt": evaluation.is_original_receipt,
+            "primary_category": evaluation.primary_receipt_category,
+            "total_amount_idr": evaluation.total_amount_idr,
+            "reward_payout_idr": payout_idr,
+            "fraud_flags": evaluation.fraud_flags,
+            "receipt_summary": evaluation.receipt_summary,
         }
-        for item in evaluation.items
-    ]
 
-    if line_items_payload:
-        client.table("line_items").insert(line_items_payload).execute()
+        response = client.table("receipts").insert(receipt_payload).execute()
+        inserted_receipts = response.data
 
-    return {
-        "status": "success",
-        "receipt_id": receipt_id,
-        "items_saved": len(line_items_payload),
-    }
+        if not inserted_receipts:
+            return {"status": "failed", "reason": "No data returned after insert"}
+
+        receipt_id = inserted_receipts[0]["id"]
+
+        # 2. Insert line items
+        line_items_payload = [
+            {
+                "receipt_id": receipt_id,
+                "item_name": item.item_name,
+                "amount_idr": item.amount_idr,
+                "classification": item.classification,
+                "confidence_reasoning": item.confidence_reasoning,
+            }
+            for item in evaluation.items
+        ]
+
+        if line_items_payload:
+            client.table("line_items").insert(line_items_payload).execute()
+
+        return {
+            "status": "success",
+            "receipt_id": receipt_id,
+            "items_saved": len(line_items_payload),
+        }
+
+    except Exception as e:
+        err_msg = str(e)
+        if "PGRST205" in err_msg or "receipts" in err_msg:
+            return {
+                "status": "pending_schema",
+                "reason": "Supabase connected! Please run schema.sql in Supabase SQL Editor to create the 'receipts' table."
+            }
+        return {"status": "error", "reason": err_msg}
