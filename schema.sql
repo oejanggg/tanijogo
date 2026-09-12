@@ -2,8 +2,17 @@
 -- Run this in your Supabase SQL Editor
 
 -- 1. Create Enum Types
-CREATE TYPE receipt_category AS ENUM ('COGS', 'OPEX', 'CAPEX', 'MIXED', 'INVALID');
-CREATE TYPE item_classification AS ENUM ('COGS', 'OPEX', 'CAPEX', 'UNCLASSIFIED');
+DO $$ BEGIN
+    CREATE TYPE receipt_category AS ENUM ('COGS', 'OPEX', 'CAPEX', 'MIXED', 'INVALID');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE item_classification AS ENUM ('COGS', 'OPEX', 'CAPEX', 'UNCLASSIFIED');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- 2. Create Receipts Table
 CREATE TABLE IF NOT EXISTS receipts (
@@ -35,3 +44,13 @@ CREATE TABLE IF NOT EXISTS line_items (
 CREATE INDEX IF NOT EXISTS idx_line_items_receipt_id ON line_items(receipt_id);
 CREATE INDEX IF NOT EXISTS idx_line_items_classification ON line_items(classification);
 CREATE INDEX IF NOT EXISTS idx_receipts_created_at ON receipts(created_at);
+
+-- 5. Enable Row Level Security (RLS) & Grant Access to Anon / Service Keys
+ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE line_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public receipts access" ON receipts;
+CREATE POLICY "Public receipts access" ON receipts FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public line_items access" ON line_items;
+CREATE POLICY "Public line_items access" ON line_items FOR ALL USING (true) WITH CHECK (true);
