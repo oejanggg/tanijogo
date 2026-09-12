@@ -7,6 +7,7 @@ load_dotenv()
 
 from src.ocr_pipeline import analyze_receipt
 from src.financial_engine import calculate_reward, calculate_hpp
+from src.db import save_receipt_evaluation
 
 
 def run_audit(image_path: str = "assets/samples/test2.jpeg"):
@@ -48,6 +49,10 @@ def run_audit(image_path: str = "assets/samples/test2.jpeg"):
     print("-" * 50)
     print(f"  TARGET SELLING PRICE (HPP): Rp {financials['hpp_per_kg']:,} per Kg")
     print("=" * 50 + "\n")
+
+    # Save to Supabase
+    db_result = save_receipt_evaluation(evaluation, payout_idr=payout)
+    print(f"🗄️ Database Status: {db_result['status'].upper()} ({db_result.get('reason', 'Receipt & line items stored in Supabase')})")
 
 
 if __name__ == "__main__":
