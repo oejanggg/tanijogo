@@ -16,10 +16,10 @@ MERCHANTS_CLEAN = [
     "Gudang Hasil Panen Pak Slamet", "Kelompok Tani Harapan Bersama"
 ]
 
-MERCHANTS_UNRELATED = [
-    "Warung Makan Padang Sederhana", "Toko Elektronik Cahaya",
-    "Bengkel Motor Sinar Jaya", "Restoran Solaria Mall", "Minimarket Indomaret"
-]
+# MERCHANTS_UNRELATED = [
+#     "Warung Makan Padang Sederhana", "Toko Elektronik Cahaya",
+#     "Bengkel Motor Sinar Jaya", "Restoran Solaria Mall", "Minimarket Indomaret"
+# ]
 
 # FARM_ITEMS_POOL = [
 #     ("Cabai Merah Keriting", "COGS", 32000, 45000),

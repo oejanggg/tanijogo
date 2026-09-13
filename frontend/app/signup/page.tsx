@@ -26,7 +26,7 @@ export default function SignupPage() {
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!authLoading && user) router.push("/home");
+    if (!authLoading && user) router.push("/login");
   }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
