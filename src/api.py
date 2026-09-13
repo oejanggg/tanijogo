@@ -37,6 +37,17 @@ app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
 
 
 AUDITED_IMAGE_HASHES = set()
+AUDITED_CONTENT_FINGERPRINTS = set()
+
+
+def compute_receipt_content_fingerprint(evaluation: ReceiptEvaluation) -> str:
+    """Computes a semantic content fingerprint from extracted OCR receipt fields."""
+    merchant = (evaluation.merchant_name or "").strip().lower()
+    total = evaluation.total_amount_idr
+    item_sigs = sorted([f"{i.item_name.lower().strip()}:{i.amount_idr}" for i in evaluation.items])
+    raw_sig = f"{merchant}|{total}|{'|'.join(item_sigs)}"
+    import hashlib
+    return hashlib.md5(raw_sig.encode()).hexdigest()
 
 
 @app.get("/")
@@ -51,7 +62,7 @@ async def root():
 @app.post("/audit")
 @app.post("/api/v1/audit")
 async def audit_receipt_file(file: UploadFile = File(...)):
-    """Audits an uploaded receipt image: OCR + Duplicate Check + HPP + Reward + ElevenLabs Voice Brief + Supabase Logging."""
+    """Audits an uploaded receipt image: OCR + Dual-Layer Duplicate Check + HPP + Reward + ElevenLabs Voice Brief + Supabase Logging."""
     original_filename = file.filename or "receipt.jpg"
     temp_path = os.path.join(UPLOAD_DIR, original_filename)
 
@@ -60,22 +71,28 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         with open(temp_path, "wb") as buffer:
             buffer.write(content_bytes)
 
-        # Calculate Image Hash for Duplicate Detection
+        # Calculate Image Hash for Layer 1 Duplicate Detection
         import hashlib
         image_hash = hashlib.sha256(content_bytes).hexdigest()
 
         # Step 1: Gemini Vision OCR Audit
         evaluation = analyze_receipt(temp_path)
 
-        # Step 2: Check for Duplicate Receipt Submission
-        is_duplicate = image_hash in AUDITED_IMAGE_HASHES
-        if is_duplicate:
+        # Step 2: Dual-Layer Check for Duplicate Receipt Submission
+        content_fingerprint = compute_receipt_content_fingerprint(evaluation)
+        is_image_duplicate = image_hash in AUDITED_IMAGE_HASHES
+        is_content_duplicate = content_fingerprint in AUDITED_CONTENT_FINGERPRINTS
+
+        if is_image_duplicate or is_content_duplicate:
             evaluation.is_original_receipt = False
             evaluation.primary_receipt_category = "INVALID"
-            if "Terdeteksi Duplikasi: Nota ini sudah pernah di-scan sebelumnya" not in evaluation.fraud_flags:
-                evaluation.fraud_flags.append("Terdeteksi Duplikasi: Nota ini sudah pernah di-scan sebelumnya")
+            reason = "Foto nota sudah pernah di-scan sebelumnya" if is_image_duplicate else "Detail isi transaksi nota ini sudah pernah dicatat di sistem"
+            flag_msg = f"Terdeteksi Duplikasi: {reason}"
+            if flag_msg not in evaluation.fraud_flags:
+                evaluation.fraud_flags.append(flag_msg)
         else:
             AUDITED_IMAGE_HASHES.add(image_hash)
+            AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
 
         # Step 3: HPP & Micro-Cash Reward Calculation
         payout = calculate_reward(evaluation)
