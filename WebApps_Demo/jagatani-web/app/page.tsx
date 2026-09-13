@@ -197,18 +197,63 @@ export default function Home() {
                 )}
 
                 {/* Financial Intelligence */}
-                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                  <h3 className="font-bold text-blue-900 mb-1">Financial Intelligence</h3>
-                  {record.estimated_yield_kg && (
-                    <p className="text-sm text-blue-800 mb-2">Based on estimated {record.estimated_yield_kg} Kg yield</p>
-                  )}
-                  <div className="flex justify-between items-center text-sm font-medium">
-                    <span className="text-blue-700">Total Production Cost:</span>
-                    <span>Rp {(financials.total_production_cost ?? record.total_production_cost_idr ?? 0).toLocaleString()}</span>
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-bold text-blue-900">Financial Intelligence</h3>
+                    <span className="text-xs bg-blue-100 text-blue-800 font-semibold px-2 py-0.5 rounded">HPP Engine</span>
                   </div>
-                  <div className="flex justify-between items-center mt-2 pt-2 border-t border-blue-200">
-                    <span className="font-bold text-blue-900">Target HPP / Kg:</span>
-                    <span className="font-bold text-lg text-blue-700">Rp {(financials.hpp_per_kg ?? record.hpp_per_kg_idr ?? 0).toLocaleString()}</span>
+
+                  {record.estimated_yield_kg && (
+                    <p className="text-xs text-blue-700">Calculated for 1.5 Tons ({record.estimated_yield_kg} Kg) harvest yield</p>
+                  )}
+
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-sm font-medium">
+                      <span className="text-blue-800">Total Cost of Production:</span>
+                      <span className="font-bold">Rp {(financials.total_production_cost ?? record.total_production_cost_idr ?? 0).toLocaleString()}</span>
+                    </div>
+                    
+                    {/* Visual Cost Category Distribution Bar */}
+                    {(() => {
+                      const total = financials.total_production_cost || 1;
+                      const cogsPct = Math.round(((financials.cogs_total || 0) / total) * 100);
+                      const opexPct = Math.round(((financials.opex_total || 0) / total) * 100);
+                      const capexPct = Math.min(100 - cogsPct - opexPct, 100);
+
+                      return (
+                        <div className="space-y-2 pt-1">
+                          <div className="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden flex">
+                            <div style={{ width: `${cogsPct}%` }} className="bg-emerald-500 h-full" title={`COGS ${cogsPct}%`} />
+                            <div style={{ width: `${opexPct}%` }} className="bg-amber-500 h-full" title={`OPEX ${opexPct}%`} />
+                            <div style={{ width: `${capexPct}%` }} className="bg-purple-500 h-full" title={`Amortized CAPEX ${capexPct}%`} />
+                          </div>
+                          <div className="grid grid-cols-3 gap-1 text-[11px] font-medium pt-1">
+                            <div className="flex items-center text-emerald-800">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 mr-1 shrink-0" />
+                              <span>COGS: Rp {(financials.cogs_total || 0).toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center text-amber-800">
+                              <span className="w-2 h-2 rounded-full bg-amber-500 mr-1 shrink-0" />
+                              <span>OPEX: Rp {(financials.opex_total || 0).toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center text-purple-800">
+                              <span className="w-2 h-2 rounded-full bg-purple-500 mr-1 shrink-0" />
+                              <span>CAPEX*: Rp {(financials.amortized_capex || 0).toLocaleString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2 border-t border-blue-200">
+                    <div>
+                      <span className="font-bold text-blue-900 block text-sm">Target Break-even HPP:</span>
+                      <span className="text-[10px] text-blue-600">Minimum sell price per Kg</span>
+                    </div>
+                    <span className="font-extrabold text-xl text-blue-700 bg-white px-3 py-1 rounded-lg border border-blue-200 shadow-sm">
+                      Rp {(financials.hpp_per_kg ?? record.hpp_per_kg_idr ?? 0).toLocaleString()} <span className="text-xs font-normal text-gray-500">/ Kg</span>
+                    </span>
                   </div>
                 </div>
               </section>
