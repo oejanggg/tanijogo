@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
-from src.ocr_pipeline import analyze_receipt
-from src.financial_engine import calculate_reward, calculate_hpp
-from src.db import save_receipt_evaluation
-from src.voice import generate_farmer_script, synthesize_audio_brief
+from backend.ocr_pipeline import analyze_receipt
+from backend.financial_engine import calculate_reward, calculate_hpp
+from backend.db import save_receipt_evaluation
+from backend.voice import generate_farmer_script, synthesize_audio_brief
 
 
 def run_audit(image_path: str = "assets/samples/nota_panen_cabai.jpg"):

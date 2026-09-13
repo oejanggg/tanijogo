@@ -1,7 +1,7 @@
 import os
 from typing import Dict, Any, Optional
 from supabase import create_client, Client
-from src.schemas import ReceiptEvaluation
+from backend.schemas import ReceiptEvaluation
 
 
 def get_supabase_client() -> Optional[Client]:

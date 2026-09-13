@@ -1,7 +1,7 @@
 import os
 import requests
 from typing import Dict, Any, Optional
-from src.schemas import ReceiptEvaluation
+from backend.schemas import ReceiptEvaluation
 
 
 def format_idr_english(amount: int) -> str:

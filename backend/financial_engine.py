@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from src.schemas import ReceiptEvaluation
+from backend.schemas import ReceiptEvaluation, CostItem
 
 
 def calculate_reward(evaluation: ReceiptEvaluation, base_reward_idr: int = 5000) -> int:

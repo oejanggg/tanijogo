@@ -24,7 +24,7 @@ Before deploying the frontend or backend, ensure your Supabase database schema a
 
 ## 2. Environment Variables
 
-### Backend (`src/api.py` / Container)
+### Backend (`backend/api.py` / Container)
 | Variable | Description | Example |
 |---|---|---|
 | `GEMINI_API_KEY` | Google Gemini API Key | `AIzaSy...` |
@@ -33,10 +33,10 @@ Before deploying the frontend or backend, ensure your Supabase database schema a
 | `ELEVENLABS_MODEL_ID` | Model ID | `eleven_turbo_v2_5` |
 | `SUPABASE_URL` | Supabase Project URL | `https://xxxx.supabase.co` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase Service Role Key | `eyJ...` |
-| `ALLOWED_ORIGINS` | Comma-separated CORS origins | `https://sukatani.app,https://your-app.vercel.app` |
+| `ALLOWED_ORIGINS` | Comma-separated CORS origins | `https://sukatani.app,https://your-app.netlify.app` |
 | `PORT` | API Server Port (assigned by host) | `8000` |
 
-### Frontend (`WebApps_Demo/jagatani-web`)
+### Frontend (`frontend`)
 | Variable | Description | Example |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL | `https://xxxx.supabase.co` |
@@ -53,9 +53,9 @@ Before deploying the frontend or backend, ensure your Supabase database schema a
 3. Click **Add new site** → **Import an existing project** → Select `oejanggg/tanijogo`.
 4. Configure the build settings (already set via `netlify.toml`):
    - **Branch**: `release/production-ready`
-   - **Base directory**: `WebApps_Demo/jagatani-web`
+   - **Base directory**: `frontend`
    - **Build command**: `npm run build`
-   - **Publish directory**: `WebApps_Demo/jagatani-web/out`
+   - **Publish directory**: `frontend/out`
 5. Under **Site configuration → Environment variables**, add:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -67,7 +67,7 @@ Before deploying the frontend or backend, ensure your Supabase database schema a
 2. Create a new **Web Service** using the included `render.yaml` Blueprint or:
    - **Runtime**: Python 3.11
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `uvicorn src.api:app --host 0.0.0.0 --port $PORT`
+   - **Start Command**: `uvicorn backend.api:app --host 0.0.0.0 --port $PORT`
    - **Health Check Path**: `/health`
 3. Add your environment variables (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, `SUPABASE_URL`, etc.).
 4. Set `ALLOWED_ORIGINS` to your Netlify site URL (e.g. `https://your-site.netlify.app`).

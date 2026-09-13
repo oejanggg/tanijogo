@@ -5,13 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.ocr_pipeline import analyze_receipt
-from src.financial_engine import calculate_reward, calculate_hpp
-from src.db import save_receipt_evaluation
+from backend.ocr_pipeline import analyze_receipt
+from backend.financial_engine import calculate_reward, calculate_hpp
+from backend.db import save_receipt_evaluation
 
 
 def run_batch_audit():
-    dataset_images = sorted(glob.glob("assets/synthetic_dataset/receipt_*.jpg"))
+    dataset_images = sorted(glob.glob("benchmarks/synthetic_dataset/receipt_*.jpg"))
     total_images = len(dataset_images)
 
     print("\n" + "=" * 60)

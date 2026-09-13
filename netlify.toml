@@ -1,5 +1,5 @@
 [build]
-  base = "WebApps_Demo/jagatani-web"
+  base = "frontend"
   publish = "out"
   command = "npm run build"
 

@@ -2,7 +2,7 @@ import os
 import json
 from google import genai
 from google.genai import types
-from src.schemas import ReceiptEvaluation, CostItem
+from backend.schemas import ReceiptEvaluation, CostItem
 
 
 SYSTEM_PROMPT = """

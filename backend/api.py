@@ -8,11 +8,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.schemas import ReceiptEvaluation
-from src.ocr_pipeline import analyze_receipt
-from src.financial_engine import calculate_reward, calculate_hpp
-from src.db import save_receipt_evaluation, get_supabase_client
-from src.voice import generate_farmer_script, synthesize_audio_brief
+from backend.schemas import ReceiptEvaluation
+from backend.ocr_pipeline import analyze_receipt
+from backend.financial_engine import calculate_reward, calculate_hpp
+from backend.db import save_receipt_evaluation, get_supabase_client
+from backend.voice import generate_farmer_script, synthesize_audio_brief
 
 app = FastAPI(
     title="SukaTani Financial Intelligence API",

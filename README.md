@@ -50,35 +50,37 @@ flowchart TD
 
 ```text
 .
-├── src/                              # Python Financial Intelligence Backend
+├── backend/                          # Python Financial Intelligence Backend
 │   ├── api.py                        # FastAPI endpoints (/audit, /health, /audio)
 │   ├── ocr_pipeline.py               # Gemini Vision receipt analysis & extraction
 │   ├── financial_engine.py           # HPP break-even & cash reward math
 │   ├── voice.py                      # ElevenLabs natural speech synthesis
 │   ├── db.py                         # Supabase database client & helpers
 │   └── schemas.py                    # Pydantic data contracts
-├── WebApps_Demo/
-│   └── jagatani-web/                 # Next.js 16 Web Application Frontend
-│       ├── app/                      # App router (all pages in English)
-│       │   ├── page.tsx              # Splash landing & auth redirect
-│       │   ├── login/ & signup/      # User authentication & profiles
-│       │   ├── home/                 # Dashboard, wallet & photo audit trigger
-│       │   ├── verdict/              # AI audit result & audio playback
-│       │   ├── confirm/              # Numeric keypad & category classifier
-│       │   ├── receipts/             # Monthly ledger with expandable voice transcripts
-│       │   ├── harvest/              # Seasonal yield & break-even calculation
-│       │   └── report/               # Verified KUR bank credit report
-│       ├── lib/                      # Supabase client & protected route hooks
-│       ├── public/                   # Static assets & Netlify _redirects
-│       ├── Dockerfile                # Multi-stage standalone frontend Dockerfile
-│       └── netlify.toml              # Netlify build & redirect configuration
-├── assets/
-│   ├── samples/                      # Real-world benchmark receipts
+├── frontend/                         # Next.js 16 Web Application Frontend
+│   ├── app/                          # App router (all pages in English)
+│   │   ├── page.tsx                  # Splash landing & auth redirect
+│   │   ├── login/ & signup/          # User authentication & profiles
+│   │   ├── home/                     # Dashboard, wallet & photo audit trigger
+│   │   ├── verdict/                  # AI audit result & audio playback
+│   │   ├── confirm/                  # Numeric keypad & category classifier
+│   │   ├── receipts/                 # Monthly ledger with expandable voice transcripts
+│   │   ├── harvest/                  # Seasonal yield & break-even calculation
+│   │   └── report/                   # Verified KUR bank credit report
+│   ├── lib/                          # Supabase client & protected route hooks
+│   ├── public/                       # Static assets & Netlify _redirects
+│   ├── Dockerfile                    # Multi-stage standalone frontend Dockerfile
+│   └── netlify.toml                  # Netlify build & redirect configuration
+├── benchmarks/                       # Hackathon Evaluation Suite & Benchmark Data
 │   ├── synthetic_dataset/            # 50-receipt synthetic evaluation dataset
+│   ├── scripts/                      # batch_audit_50.py & dataset generators
+│   ├── Test_Code.ipynb               # Exploratory prototyping notebook
+│   └── README.md                     # Benchmark documentation & test instructions
+├── assets/
+│   ├── samples/                      # Real-world benchmark farm receipts
 │   ├── audio_briefs/                 # Runtime directory for generated MP3 briefs
 │   └── uploads/                      # Runtime directory for temporary uploads
 ├── docs/                             # Architecture & product specifications
-├── scripts/                          # Batch testing & evaluation scripts
 ├── DEPLOYMENT.md                     # Production deployment guide (Netlify / Docker)
 ├── Dockerfile                        # Production backend Dockerfile
 ├── docker-compose.yml                # Full-stack local & VPS orchestration
@@ -100,13 +102,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # Start backend server
-uvicorn src.api:app --reload --port 8000
+uvicorn backend.api:app --reload --port 8000
 ```
 Backend API will be running at `http://localhost:8000` (Health check at `http://localhost:8000/health`).
 
 ### 2. Run the Next.js Frontend
 ```bash
-cd WebApps_Demo/jagatani-web
+cd frontend
 npm install
 npm run dev
 ```
@@ -121,6 +123,6 @@ docker compose up --build
 
 ## 🌐 Production Deployment
 
-- **Frontend on Netlify**: Automatically builds from `WebApps_Demo/jagatani-web/out` using [`netlify.toml`](./netlify.toml).
+- **Frontend on Netlify**: Automatically builds from `frontend/out` using [`netlify.toml`](./netlify.toml).
 - **Backend on Render / Railway**: Configured via [`render.yaml`](./render.yaml) and root [`Dockerfile`](./Dockerfile).
 - See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for full step-by-step instructions.

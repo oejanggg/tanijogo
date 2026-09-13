@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy source code and configuration
-COPY src/ ./src/
+COPY backend/ ./backend/
 COPY main.py .
 
 # Create required runtime asset directories
@@ -29,4 +29,4 @@ RUN mkdir -p assets/uploads assets/audio_briefs
 EXPOSE 8000
 
 # Run with production ASGI server
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "8000"]

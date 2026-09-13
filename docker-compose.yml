@@ -31,7 +31,7 @@ services:
   # Next.js 16 Web Application Frontend
   web:
     build:
-      context: ./WebApps_Demo/jagatani-web
+      context: ./frontend
       dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-${SUPABASE_URL}}
