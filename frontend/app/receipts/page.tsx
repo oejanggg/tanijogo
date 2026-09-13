@@ -2,23 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Receipt as ReceiptIcon, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
-import { supabase } from "../../lib/supabase";
+import { ChevronLeft, Receipt as ReceiptIcon, AlertCircle, ChevronDown, ChevronUp, Volume2 } from "lucide-react";
 import { useProtected } from "../lib/use-protected";
 import BottomNav from "../components/BottomNav";
-
-type LedgerRow = {
-  id: string;
-  merchant_name: string;
-  primary_category: string;
-  reward_earned: number;
-  fraud_detected: boolean;
-  created_at: string;
-  total_production_cost: number;
-  hpp_per_kg: number;
-  voice_transcript: string | null;
-  audio_url: string | null;
-};
+import { fetchAllReceipts, LedgerItem } from "../lib/ledger-storage";
 
 const CATEGORY_STYLE: Record<string, { bg: string; text: string; emoji: string }> = {
   seed: { bg: "bg-emerald-100", text: "text-emerald-800", emoji: "🌱" },
@@ -35,10 +22,10 @@ function getCategoryStyle(cat: string) {
   return key ? CATEGORY_STYLE[key] : { bg: "bg-slate-100", text: "text-slate-700", emoji: "🧾" };
 }
 
-function groupByMonth(rows: LedgerRow[]) {
-  const groups: Record<string, LedgerRow[]> = {};
+function groupByMonth(rows: LedgerItem[]) {
+  const groups: Record<string, LedgerItem[]> = {};
   rows.forEach((row) => {
-    const d = new Date(row.created_at);
+    const d = new Date(row.created_at || Date.now());
     const key = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
     if (!groups[key]) groups[key] = [];
     groups[key].push(row);
@@ -49,17 +36,13 @@ function groupByMonth(rows: LedgerRow[]) {
 export default function ReceiptsPage() {
   const router = useRouter();
   const { user } = useProtected();
-  const [ledger, setLedger] = useState<LedgerRow[]>([]);
+  const [ledger, setLedger] = useState<LedgerItem[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("farmer_ledger")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => { if (data) setLedger(data as LedgerRow[]); });
+    fetchAllReceipts(user?.id).then((data) => {
+      setLedger(data);
+    });
   }, [user]);
 
   const totalExpenses = ledger.reduce((s, r) => s + (r.total_production_cost || 0), 0);
@@ -77,7 +60,7 @@ export default function ReceiptsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-extrabold text-slate-900">Receipts</h1>
-            <p className="text-slate-500 text-xs font-medium mt-0.5">Grouped by month · Your uploads only</p>
+            <p className="text-slate-500 text-xs font-medium mt-0.5">Farm ledger records · Verified uploads</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Total Expenses</p>
@@ -93,9 +76,9 @@ export default function ReceiptsPage() {
             <div className="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center">
               <ReceiptIcon size={32} className="text-slate-400" />
             </div>
-            <p className="font-bold text-slate-700 text-base">No receipts yet</p>
+            <p className="font-bold text-slate-700 text-base">No receipts recorded yet</p>
             <p className="text-slate-500 text-xs text-center max-w-[220px] leading-relaxed">
-              Upload your first farm receipt to start tracking expenses
+              Photograph or upload your farm receipt to start building your verified expense history
             </p>
             <button onClick={() => router.push("/home")}
               className="bg-emerald-700 text-white px-6 py-3 rounded-2xl font-bold text-sm mt-2 hover:bg-emerald-800 transition-colors shadow-md shadow-emerald-600/20">
@@ -122,7 +105,7 @@ export default function ReceiptsPage() {
 
                 {rows.map((row) => {
                   const catStyle = getCategoryStyle(row.primary_category);
-                  const date = new Date(row.created_at);
+                  const date = new Date(row.created_at || Date.now());
                   const isOpen = expanded === row.id;
                   return (
                     <div key={row.id} className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
@@ -137,7 +120,7 @@ export default function ReceiptsPage() {
                           <p className="font-bold text-slate-900 text-sm truncate">{row.merchant_name || "Farm Supplier"}</p>
                           <div className="flex items-center space-x-1.5 mt-1 flex-wrap gap-y-1">
                             <span className={"text-[10px] font-bold px-2 py-0.5 rounded-md " + catStyle.bg + " " + catStyle.text}>
-                              {row.primary_category || "Farm Input"}
+                              {(row.primary_category || "Farm Input").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                             </span>
                             <span className="text-[10px] text-slate-400 font-medium">
                               {date.toLocaleDateString("en-US", { day: "numeric", month: "short" })}
@@ -160,7 +143,7 @@ export default function ReceiptsPage() {
                         </div>
                       </button>
 
-                      {/* Expandable transcript */}
+                      {/* Expandable details & transcript */}
                       {isOpen && (
                         <div className="px-4 pb-4 space-y-2.5 border-t border-slate-100 pt-3">
                           {row.hpp_per_kg > 0 && (
@@ -175,7 +158,7 @@ export default function ReceiptsPage() {
                               <p className="text-xs text-purple-900 italic leading-relaxed">&ldquo;{row.voice_transcript}&rdquo;</p>
                             </div>
                           ) : (
-                            <p className="text-[10px] text-slate-400 font-medium text-center py-1">No voice transcript for this receipt</p>
+                            <p className="text-[10px] text-slate-400 font-medium text-center py-1">Standard farm transaction record</p>
                           )}
                           {row.audio_url && (
                             <audio controls className="w-full h-8 rounded-xl accent-purple-600">

@@ -3,26 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Share2, CheckCircle2, AlertCircle, Clock, BarChart2 } from "lucide-react";
-import { supabase } from "../../lib/supabase";
 import { useProtected } from "../lib/use-protected";
 import BottomNav from "../components/BottomNav";
+import { fetchAllReceipts, LedgerItem } from "../lib/ledger-storage";
 
 export default function ReportPage() {
   const router = useRouter();
   const { user } = useProtected();
-  const [ledger, setLedger] = useState<any[]>([]);
-  const [showPartial, setShowPartial] = useState(false);
+  const [ledger, setLedger] = useState<LedgerItem[]>([]);
 
   useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("farmer_ledger")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        if (data) setLedger(data);
-      });
+    fetchAllReceipts(user?.id).then((data) => {
+      setLedger(data);
+    });
   }, [user]);
 
   const totalReceipts = ledger.length;
@@ -32,7 +25,7 @@ export default function ReportPage() {
   // Determine months with data
   const monthsWithData = new Set(
     ledger.map((r) => {
-      const d = new Date(r.created_at);
+      const d = new Date(r.created_at || Date.now());
       return `${d.getFullYear()}-${d.getMonth()}`;
     })
   ).size;
@@ -41,7 +34,7 @@ export default function ReportPage() {
   const monthsNeeded = Math.max(0, TARGET_MONTHS - monthsWithData);
 
   // Date range
-  const dates = ledger.map((r) => new Date(r.created_at)).sort((a, b) => a.getTime() - b.getTime());
+  const dates = ledger.map((r) => new Date(r.created_at || Date.now())).sort((a, b) => a.getTime() - b.getTime());
   const startDate =
     dates[0]?.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" }) || "—";
   const endDate =
@@ -107,7 +100,7 @@ export default function ReportPage() {
           </div>
 
           {/* Main report card (glassmorphic) */}
-          <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 rounded-2xl p-5 space-y-4 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900 rounded-2xl p-5 space-y-4 relative overflow-hidden shadow-lg">
             <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
             <div className="absolute bottom-0 -left-4 w-24 h-24 bg-teal-400/10 rounded-full blur-xl pointer-events-none" />
 
@@ -187,19 +180,19 @@ export default function ReportPage() {
               <div className="flex items-center justify-between">
                 <p className="text-xs font-bold text-slate-700">Audit Progress</p>
                 <p className="text-[10px] font-bold text-slate-500">
-                  {monthsWithData}/{TARGET_MONTHS} months recorded
+                  {monthsWithData}/{TARGET_MONTHS} months recorded ({totalReceipts} receipts)
                 </p>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-emerald-600 to-teal-500 rounded-full transition-all duration-700"
-                  style={{ width: `${Math.min(100, (monthsWithData / TARGET_MONTHS) * 100)}%` }}
+                  style={{ width: `${Math.min(100, Math.max(10, (monthsWithData / TARGET_MONTHS) * 100))}%` }}
                 />
               </div>
               <div className="flex items-center space-x-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
                 <Clock size={14} className="text-amber-600 shrink-0" />
                 <p className="text-xs text-amber-800 font-semibold">
-                  Need {monthsNeeded} more month{monthsNeeded !== 1 ? "s" : ""} of data
+                  Need {monthsNeeded} more month{monthsNeeded !== 1 ? "s" : ""} of verified data
                 </p>
               </div>
               <p className="text-[10px] text-slate-500 font-medium leading-relaxed">

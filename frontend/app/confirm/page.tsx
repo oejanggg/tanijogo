@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Check, X, Delete, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { updateLedgerReceipt } from "../lib/ledger-storage";
 
 const CATEGORIES = [
   { id: "seed_fertilizer", emoji: "🌱", title: "Seed & Fertilizer", desc: "Planting inputs", color: "emerald" },
@@ -55,21 +56,17 @@ export default function ConfirmPage() {
     if (!selectedCat) return;
     setSaving(true);
 
-    // Update the ledger row with the selected category
     const ledgerId = sessionStorage.getItem("lastLedgerId");
     if (ledgerId) {
-      await supabase
-        .from("farmer_ledger")
-        .update({
-          primary_category: selectedCat,
-          total_production_cost: amount,
-        })
-        .eq("id", ledgerId);
+      await updateLedgerReceipt(ledgerId, {
+        primary_category: selectedCat,
+        total_production_cost: amount,
+      });
     }
 
     sessionStorage.setItem("confirmedCategory", selectedCat);
     setSaved(true);
-    setTimeout(() => router.push("/home"), 1000);
+    setTimeout(() => router.push("/home"), 800);
   };
 
   return (
