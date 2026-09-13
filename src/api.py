@@ -113,7 +113,9 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         audio_path = os.path.join(AUDIO_DIR, audio_filename)
         voice_res = synthesize_audio_brief(script, output_filename=audio_path)
 
-        audio_url = f"/audio/{audio_filename}" if voice_res.get("status") == "success" else ""
+        import time
+        ts = int(time.time() * 1000)
+        audio_url = f"/audio/{audio_filename}?t={ts}" if voice_res.get("status") == "success" else ""
 
         # Response payload matching both WebApps_Demo frontend and API contracts
         return {

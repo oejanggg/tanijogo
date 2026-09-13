@@ -208,11 +208,26 @@ export default function Home() {
                     <p className="text-xs text-gray-500 uppercase font-semibold">Quality Score</p>
                     <p className="text-2xl font-bold text-gray-800">{record.image_quality_score}/10</p>
                   </div>
-                  <div className="bg-emerald-50 p-3 rounded-lg text-center border border-emerald-100">
-                    <p className="text-xs text-emerald-600 uppercase font-semibold">Reward</p>
-                    <p className="text-2xl font-bold text-emerald-700">+Rp {reward.toLocaleString()}</p>
+                  <div className={`p-3 rounded-lg text-center border ${reward > 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+                    <p className={`text-xs uppercase font-semibold ${reward > 0 ? 'text-emerald-600' : 'text-red-600'}`}>Reward</p>
+                    <p className={`text-2xl font-bold ${reward > 0 ? 'text-emerald-700' : 'text-red-600'}`}>+Rp {reward.toLocaleString()}</p>
                   </div>
                 </div>
+
+                {/* Fraud & Rejection Alert Banner */}
+                {(!record.is_original_receipt || (record.fraud_flags && record.fraud_flags.length > 0)) && (
+                  <div className="bg-red-50 border border-red-200 p-4 rounded-xl space-y-2">
+                    <div className="flex items-center text-red-800 font-bold text-sm">
+                      <AlertTriangle size={18} className="mr-2 text-red-600 shrink-0" />
+                      <span>Insentif Ditolak Sistem (Rp 0)</span>
+                    </div>
+                    <ul className="text-xs text-red-700 list-disc list-inside space-y-1 font-medium">
+                      {record.fraud_flags?.map((flag: string, idx: number) => (
+                        <li key={idx}>{flag}</li>
+                      )) || <li>Nota tidak sesuai standar audit SukaTani</li>}
+                    </ul>
+                  </div>
+                )}
 
                 {/* Spoken Indonesian Voice Brief (ElevenLabs Multilingual V2) */}
                 {voice.transcript && (
