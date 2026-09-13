@@ -8,9 +8,10 @@ load_dotenv()
 from src.ocr_pipeline import analyze_receipt
 from src.financial_engine import calculate_reward, calculate_hpp
 from src.db import save_receipt_evaluation
+from src.voice import generate_farmer_script, synthesize_audio_brief
 
 
-def run_audit(image_path: str = "assets/samples/test2.jpeg"):
+def run_audit(image_path: str = "assets/samples/nota_panen_cabai.jpg"):
     print(f"Analyzing receipt: {image_path}...")
     try:
         evaluation = analyze_receipt(image_path)
@@ -54,7 +55,23 @@ def run_audit(image_path: str = "assets/samples/test2.jpeg"):
     db_result = save_receipt_evaluation(evaluation, payout_idr=payout)
     print(f"🗄️ Database Status: {db_result['status'].upper()} ({db_result.get('reason', 'Receipt & line items stored in Supabase')})")
 
+    # Generate ElevenLabs Voice Brief Script & Audio
+    script = generate_farmer_script(evaluation, payout_idr=payout, hpp_financials=financials)
+    base_name = os.path.splitext(os.path.basename(image_path))[0]
+    audio_path = f"assets/audio_briefs/{base_name}_brief.mp3"
+    voice_res = synthesize_audio_brief(script, output_filename=audio_path)
+
+    print("\n" + "=" * 50)
+    print("🔊 ELEVENLABS SPOKEN VOICE BRIEF (FOR PAK JOKO)")
+    print("=" * 50)
+    print(f"Script: \"{script}\"")
+    if voice_res["status"] == "success":
+        print(f"🎙️ Audio Generated: {voice_res['audio_path']} (Model: {voice_res['model']})")
+    else:
+        print(f"ℹ️ Audio Status: {voice_res['status'].upper()} ({voice_res.get('reason')})")
+    print("=" * 50 + "\n")
+
 
 if __name__ == "__main__":
-    img_arg = sys.argv[1] if len(sys.argv) > 1 else "assets/samples/test2.jpeg"
+    img_arg = sys.argv[1] if len(sys.argv) > 1 else "assets/samples/nota_panen_cabai.jpg"
     run_audit(img_arg)
