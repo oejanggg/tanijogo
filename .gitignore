@@ -1,8 +1,27 @@
+# Environment & Secrets
 .env
+*.env.local
+*.pem
+
+# Python Virtual Environments & Bytecode
 .venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OS Specific
 .DS_Store
-**/.next/
+Thumbs.db
+
+# Node.js & Next.js Build Outputs
 **/node_modules/
+**/.next/
 **/.netlify/
+WebApps_Demo/jagatani-web/out/
+
+# Runtime Generated Audio Briefs & Uploads
+assets/audio_briefs/*
+!assets/audio_briefs/.gitkeep
+assets/uploads/*
+!assets/uploads/.gitkeep
