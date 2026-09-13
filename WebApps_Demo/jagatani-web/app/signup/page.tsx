@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Eye, EyeOff, ChevronLeft } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Eye, EyeOff, ChevronLeft, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { supabase } from "../../lib/supabase";
+import { useAuth } from "../lib/auth-context";
 
 type FormData = {
   firstName: string;
@@ -17,24 +19,59 @@ export default function SignupPage() {
   const [showPw, setShowPw] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<FormData>({
-    firstName: '', lastName: '', email: '', phone: '', password: ''
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [form, setForm] = useState<FormData>({ firstName: "", lastName: "", email: "", phone: "", password: "" });
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!authLoading && user) router.push("/home");
+  }, [user, authLoading, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed) return;
+    if (!agreed) { setError("You must agree to the Privacy Policy and Terms of Use."); return; }
+    if (!form.email || !form.password) { setError("Email and password are required."); return; }
+    if (form.password.length < 6) { setError("Password must be at least 6 characters."); return; }
+
     setLoading(true);
-    setTimeout(() => router.push('/home'), 900);
+    setError(null);
+
+    // 1. Create auth user
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+    });
+
+    if (signUpError) {
+      setError(signUpError.message || "Sign up failed. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    // 2. Save profile (first_name, last_name, phone)
+    if (authData.user) {
+      await supabase.from("profiles").insert([{
+        id: authData.user.id,
+        first_name: form.firstName,
+        last_name: form.lastName,
+        phone: form.phone,
+      }]);
+    }
+
+    setSuccess(true);
+    setTimeout(() => router.push("/home"), 1500);
   };
 
   const fields: { key: keyof FormData; label: string; type?: string }[] = [
-    { key: 'firstName', label: 'First Name' },
-    { key: 'lastName', label: 'Last Name' },
-    { key: 'email', label: 'Email', type: 'email' },
-    { key: 'phone', label: 'Phone Number', type: 'tel' },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email", type: "email" },
+    { key: "phone", label: "Phone Number", type: "tel" },
   ];
+
+  if (authLoading) return null;
 
   return (
     <div className="min-h-screen bg-slate-50 max-w-md mx-auto">
@@ -45,15 +82,29 @@ export default function SignupPage() {
         </button>
 
         <div className="mb-7 space-y-1">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Buat akun baru</h1>
-          <p className="text-slate-500 text-sm font-medium">Please input your credentials</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Create your account</h1>
+          <p className="text-slate-500 text-sm font-medium">Please fill in your credentials</p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center space-x-2.5 mb-4">
+            <AlertCircle size={16} className="text-red-600 shrink-0" />
+            <p className="text-red-700 text-xs font-semibold">{error}</p>
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center space-x-2.5 mb-4">
+            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+            <p className="text-emerald-700 text-xs font-semibold">Account created! Redirecting to home...</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {fields.map(({ key, label, type }) => (
             <input
               key={key}
-              type={type || 'text'}
+              type={type || "text"}
               placeholder={label}
               value={form[key]}
               onChange={(e) => setForm({ ...form, [key]: e.target.value })}
@@ -61,13 +112,13 @@ export default function SignupPage() {
             />
           ))}
 
-          {/* Password */}
           <div className="relative">
             <input
-              type={showPw ? 'text' : 'password'}
-              placeholder="Password"
+              type={showPw ? "text" : "password"}
+              placeholder="Password (min. 6 characters)"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
               className="w-full border border-slate-200 bg-white rounded-xl px-4 py-3.5 pr-12 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all shadow-xs"
             />
             <button type="button" onClick={() => setShowPw(!showPw)}
@@ -76,37 +127,28 @@ export default function SignupPage() {
             </button>
           </div>
 
-          {/* Privacy checkbox */}
-          <label className="flex items-start space-x-3 py-1.5 cursor-pointer group">
-            <div className="relative mt-0.5">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="w-4.5 h-4.5 rounded accent-emerald-600 cursor-pointer"
-              />
-            </div>
+          <label className="flex items-start space-x-3 py-1.5 cursor-pointer">
+            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)}
+              className="w-4 h-4 mt-0.5 rounded accent-emerald-600 cursor-pointer" />
             <span className="text-xs text-slate-600 leading-relaxed">
-              Agree to{' '}
-              <span className="text-emerald-700 font-bold cursor-pointer hover:underline">
-                Privacy Policy and Terms of Use
-              </span>
+              I agree to the{" "}
+              <span className="text-emerald-700 font-bold cursor-pointer hover:underline">Privacy Policy and Terms of Use</span>
             </span>
           </label>
 
           <button
             type="submit"
-            disabled={!agreed || loading}
+            disabled={!agreed || loading || success}
             className="w-full bg-gradient-to-r from-emerald-700 to-teal-600 text-white py-4 rounded-2xl font-extrabold text-sm shadow-lg shadow-emerald-600/25 hover:from-emerald-800 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] transition-all mt-1 flex items-center justify-center space-x-2"
           >
             {loading ? (
-              <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /><span>Mendaftar...</span></>
+              <><Loader2 size={16} className="animate-spin" /><span>Creating account...</span></>
             ) : <span>Sign up</span>}
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-500 mt-6">
-          Sudah punya akun?{' '}
+          Already have an account?{" "}
           <Link href="/login" className="text-emerald-700 font-bold hover:text-emerald-800">Sign in</Link>
         </p>
       </div>
