@@ -1,7 +1,7 @@
 import os
 import shutil
-from typing import List
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from typing import List, Optional
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
@@ -109,7 +109,10 @@ async def reset_ledger_cache():
 
 @app.post("/audit")
 @app.post("/api/v1/audit")
-async def audit_receipt_file(file: UploadFile = File(...)):
+async def audit_receipt_file(
+    file: UploadFile = File(...),
+    commodity: Optional[str] = Form("corn")
+):
     """Audits an uploaded receipt image: OCR + Dual-Layer Duplicate Check + HPP + Reward + ElevenLabs Voice Brief + Supabase Logging."""
     original_filename = file.filename or "receipt.jpg"
     temp_path = os.path.join(UPLOAD_DIR, original_filename)
@@ -132,9 +135,13 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         AUDITED_IMAGE_HASHES.add(image_hash)
         AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
 
-        # Step 3: HPP & Micro-Cash Reward Calculation for Corn
+        # Step 3: Commodity-specific Yield & BEP Calculation
+        target_crop = (commodity or "corn").lower()
+        crop_cfg = COMMODITY_CONFIG.get(target_crop, COMMODITY_CONFIG["corn"])
+        estimated_yield = crop_cfg.get("default_yield_kg", 5000.0)
+
         payout = calculate_reward(evaluation)
-        financials = calculate_hpp(evaluation, estimated_yield_kg=DEFAULT_CORN_YIELD_KG)
+        financials = calculate_hpp(evaluation, estimated_yield_kg=estimated_yield)
 
         # Step 3: Save to Supabase
         db_res = save_receipt_evaluation(
@@ -144,7 +151,7 @@ async def audit_receipt_file(file: UploadFile = File(...)):
             hpp_per_kg_idr=financials["hpp_per_kg"]
         )
 
-        # Step 4: ElevenLabs Spoken English Voice Brief for Corn Farmers
+        # Step 4: ElevenLabs Spoken English Voice Brief
         script = generate_farmer_script(evaluation, payout_idr=payout, hpp_financials=financials)
         audio_filename = f"{os.path.splitext(original_filename)[0]}_brief.mp3"
         audio_path = os.path.join(AUDIO_DIR, audio_filename)
@@ -157,7 +164,8 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         # Response payload matching frontend and API contracts
         return {
             "status": "success",
-            "commodity": "Corn (Jagung Pipil Kering)",
+            "commodity": crop_cfg.get("name", "Dried Corn (Jagung Pipil)"),
+            "commodity_key": target_crop,
             "reward": payout,
             "evaluation": evaluation.model_dump(),
             "transaction_record": evaluation.model_dump(),
@@ -184,14 +192,21 @@ async def audit_receipt_file(file: UploadFile = File(...)):
 @app.post("/api/v1/batch-audit")
 @app.post("/audit-batch")
 @app.post("/api/v1/audit-batch")
-async def audit_receipts_batch(files: List[UploadFile] = File(...)):
-    """Audits multiple uploaded receipt images: OCR + Duplicate Check + Micro-Rewards + Aggregated Corn HPP + Batch Voice Brief."""
+async def audit_receipts_batch(
+    files: List[UploadFile] = File(...),
+    commodity: Optional[str] = Form("corn")
+):
+    """Audits multiple uploaded receipt images: OCR + Duplicate Check + Micro-Rewards + Aggregated Commodity BEP + Batch Voice Brief."""
     if not files:
         raise HTTPException(status_code=400, detail="No files provided for batch audit.")
 
     import time
     import hashlib
     batch_ts = int(time.time() * 1000)
+
+    target_crop = (commodity or "corn").lower()
+    crop_cfg = COMMODITY_CONFIG.get(target_crop, COMMODITY_CONFIG["corn"])
+    estimated_yield = crop_cfg.get("default_yield_kg", 5000.0)
 
     results = []
     total_reward = 0
@@ -217,9 +232,9 @@ async def audit_receipts_batch(files: List[UploadFile] = File(...)):
             AUDITED_IMAGE_HASHES.add(image_hash)
             AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
 
-            # Step 3: Financials for Corn
+            # Step 3: Financials for Commodity
             payout = calculate_reward(evaluation)
-            financials = calculate_hpp(evaluation, estimated_yield_kg=DEFAULT_CORN_YIELD_KG)
+            financials = calculate_hpp(evaluation, estimated_yield_kg=estimated_yield)
 
             # Step 4: Supabase Logging
             db_res = save_receipt_evaluation(
@@ -256,8 +271,8 @@ async def audit_receipts_batch(files: List[UploadFile] = File(...)):
                 except Exception:
                     pass
 
-    # Aggregated Corn HPP
-    aggregated_hpp = int(total_production_cost / DEFAULT_CORN_YIELD_KG) if DEFAULT_CORN_YIELD_KG > 0 else 0
+    # Aggregated Commodity BEP
+    aggregated_hpp = int(total_production_cost / estimated_yield) if estimated_yield > 0 else 0
 
     # Batch Voice Brief
     batch_script = generate_batch_farmer_script(
@@ -273,13 +288,14 @@ async def audit_receipts_batch(files: List[UploadFile] = File(...)):
 
     return {
         "status": "success",
-        "commodity": "Corn (Jagung Pipil Kering)",
+        "commodity": crop_cfg.get("name", "Dried Corn (Jagung Pipil)"),
+        "commodity_key": target_crop,
         "total_files": len(files),
         "total_valid": total_valid,
         "total_reward": total_reward,
         "total_production_cost": total_production_cost,
         "aggregated_hpp_per_kg": aggregated_hpp,
-        "corn_benchmark_market_price": CORN_MARKET_BENCHMARK_IDR,
+        "benchmark_market_price": crop_cfg.get("market_benchmark_idr", CORN_MARKET_BENCHMARK_IDR),
         "results": results,
         "voice_brief": {
             "transcript": batch_script,

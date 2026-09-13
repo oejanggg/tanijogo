@@ -61,7 +61,13 @@ export default function HarvestPage() {
   const router = useRouter();
   const { user } = useProtected();
 
-  const [selectedCrop, setSelectedCrop] = useState<CommodityType>("corn");
+  const [selectedCrop, setSelectedCrop] = useState<CommodityType>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("selectedCommodity");
+      if (saved === "corn" || saved === "chili" || saved === "rice") return saved;
+    }
+    return "corn";
+  });
   const [yieldKg, setYieldKg] = useState("");
   const [soldKg, setSoldKg] = useState("");
   const [pricePerKg, setPricePerKg] = useState("");
@@ -72,8 +78,13 @@ export default function HarvestPage() {
   const activeCrop = COMMODITY_OPTIONS[selectedCrop];
 
   useEffect(() => {
-    const h = localStorage.getItem("lastHpp");
-    if (h) setHppPerKg(parseFloat(h));
+    const savedCrop = localStorage.getItem("selectedCommodity") as CommodityType | null;
+    if (savedCrop && (savedCrop === "corn" || savedCrop === "chili" || savedCrop === "rice")) {
+      setSelectedCrop(savedCrop);
+    }
+
+    const h = localStorage.getItem(`bep_${selectedCrop}`) || localStorage.getItem(`lastHpp_${selectedCrop}`);
+    if (h && parseFloat(h) > 0) setHppPerKg(parseFloat(h));
     const y = localStorage.getItem("yieldKg");
     if (y) setYieldKg(y);
 
@@ -93,10 +104,13 @@ export default function HarvestPage() {
           }
         });
     }
-  }, [user]);
+  }, [user, selectedCrop]);
 
   const handleCropSwitch = (crop: CommodityType) => {
     setSelectedCrop(crop);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedCommodity", crop);
+    }
     const target = COMMODITY_OPTIONS[crop];
     if (!yieldKg) setYieldKg(String(target.standardYield));
     if (!pricePerKg) setPricePerKg(String(target.benchmarkPrice));
@@ -115,6 +129,7 @@ export default function HarvestPage() {
 
   const handleSave = async () => {
     localStorage.setItem("yieldKg", yieldKg);
+    localStorage.setItem(`bep_${selectedCrop}`, String(effectiveHpp));
     setSaving(true);
 
     if (user) {

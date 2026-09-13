@@ -267,7 +267,11 @@ export default function HomePage() {
   const [ledger, setLedger] = useState<LedgerItem[]>([]);
   const [walletBalance, setWalletBalance] = useState(0);
   const [uploading, setUploading] = useState(false);
-  const [lastHpp, setLastHpp] = useState<number | null>(null);
+  const [commodityBeps, setCommodityBeps] = useState<Record<CommodityType, number>>({
+    corn: COMMODITIES.corn.defaultHpp,
+    chili: COMMODITIES.chili.defaultHpp,
+    rice: COMMODITIES.rice.defaultHpp,
+  });
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -284,6 +288,13 @@ export default function HomePage() {
 
   const activeCommodity = COMMODITIES[selectedCommodity];
 
+  const handleSelectCommodity = (crop: CommodityType) => {
+    setSelectedCommodity(crop);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("selectedCommodity", crop);
+    }
+  };
+
   const fetchLedger = useCallback(async () => {
     const receipts = await fetchAllReceipts(user?.id);
     setLedger(receipts);
@@ -291,17 +302,52 @@ export default function HomePage() {
     const total = receipts.reduce((s, r) => s + (r.reward_earned || 0), 0);
     setWalletBalance(total);
 
-    const hpps = receipts.filter((r) => r.hpp_per_kg > 0).map((r) => r.hpp_per_kg);
-    if (hpps.length > 0) {
-      setLastHpp(hpps[0]);
-      localStorage.setItem("lastHpp", String(hpps[0]));
-    }
+    // Compute or retrieve commodity-specific BEP
+    const beps: Record<CommodityType, number> = {
+      corn: COMMODITIES.corn.defaultHpp,
+      chili: COMMODITIES.chili.defaultHpp,
+      rice: COMMODITIES.rice.defaultHpp,
+    };
+
+    (["corn", "chili", "rice"] as CommodityType[]).forEach((crop) => {
+      // 1. Check if user customized in harvest calculator
+      const savedHarvestBep = localStorage.getItem(`bep_${crop}`);
+      if (savedHarvestBep && parseFloat(savedHarvestBep) > 0) {
+        beps[crop] = Math.round(parseFloat(savedHarvestBep));
+        return;
+      }
+
+      // 2. Check recent receipt specifically logged for this commodity
+      const cropReceipts = receipts.filter(
+        (r) => r.commodity === crop || (crop === "corn" && !r.commodity)
+      );
+      const cropHpps = cropReceipts.filter((r) => r.hpp_per_kg > 0).map((r) => r.hpp_per_kg);
+
+      // Only use receipt hpp if it's within a realistic commodity range (avoiding cross-crop 701)
+      const minRealisticBep = crop === "chili" ? 10000 : 2000;
+      const validHpp = cropHpps.find((h) => h >= minRealisticBep);
+      if (validHpp) {
+        beps[crop] = validHpp;
+      }
+    });
+
+    setCommodityBeps(beps);
   }, [user]);
 
   useEffect(() => {
+    // Restore persistent commodity preference
+    if (typeof window !== "undefined") {
+      const savedCrop = localStorage.getItem("selectedCommodity") as CommodityType | null;
+      if (savedCrop && (savedCrop === "corn" || savedCrop === "chili" || savedCrop === "rice")) {
+        setSelectedCommodity(savedCrop);
+      }
+      // Clean up legacy global 701 if present
+      const legacyHpp = localStorage.getItem("lastHpp");
+      if (legacyHpp === "701" || legacyHpp === "832") {
+        localStorage.removeItem("lastHpp");
+      }
+    }
     fetchLedger();
-    const saved = localStorage.getItem("lastHpp");
-    if (saved) setLastHpp(parseFloat(saved));
   }, [fetchLedger]);
 
   const primeAudioContext = () => {
@@ -349,6 +395,7 @@ export default function HomePage() {
         user_id: user?.id || null,
         merchant_name: rec.merchant_name || "Farm Supplier",
         primary_category: rec.primary_receipt_category || `${activeCommodity.shortName} Input`,
+        commodity: selectedCommodity,
         quality_score: rec.image_quality_score ?? 8,
         reward_earned: data.reward || 0,
         total_production_cost: fin.total_production_cost || rec.total_amount_idr || 0,
@@ -363,8 +410,8 @@ export default function HomePage() {
       await fetchLedger();
 
       if (fin.hpp_per_kg) {
-        setLastHpp(fin.hpp_per_kg);
-        localStorage.setItem("lastHpp", String(fin.hpp_per_kg));
+        setCommodityBeps((prev) => ({ ...prev, [selectedCommodity]: fin.hpp_per_kg }));
+        localStorage.setItem(`lastHpp_${selectedCommodity}`, String(fin.hpp_per_kg));
       }
 
       if (data.voice_brief?.audio_url) {
@@ -444,6 +491,7 @@ export default function HomePage() {
             user_id: user?.id || null,
             merchant_name: evalData.merchant_name || `Supplier #${idx + 1}`,
             primary_category: evalData.primary_receipt_category || `${activeCommodity.shortName} Input`,
+            commodity: selectedCommodity,
             quality_score: evalData.image_quality_score ?? 8,
             reward_earned: reward,
             total_production_cost: cost,
@@ -587,7 +635,7 @@ export default function HomePage() {
     router.push("/");
   };
 
-  const hpp = lastHpp ?? activeCommodity.defaultHpp;
+  const hpp = commodityBeps[selectedCommodity] ?? activeCommodity.defaultHpp;
   const isAboveMarket = activeCommodity.marketPrice > hpp;
   const latestTranscript = ledger.find((r) => r.voice_transcript)?.voice_transcript;
   const latestAudioAvailable = ledger.some((r) => r.audio_url);
@@ -651,7 +699,7 @@ export default function HomePage() {
             return (
               <button
                 key={cid}
-                onClick={() => setSelectedCommodity(cid)}
+                onClick={() => handleSelectCommodity(cid)}
                 className={`flex-1 flex items-center justify-center space-x-1.5 py-2 px-2 rounded-xl text-xs font-extrabold transition-all ${
                   active
                     ? "bg-emerald-800 text-white shadow-sm shadow-emerald-900/20"
