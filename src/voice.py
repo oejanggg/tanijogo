@@ -71,8 +71,8 @@ def generate_farmer_script(
         f"Kejelasan foto notanya dapet nilai {score} dari 10. Mantap! "
         f"Insentif tunai Anda langsung cair sebesar {payout_str}. "
         f"Total biaya produksi panen kali ini tercatat {cost_str}. "
-        f"Biar nggak rugi, patokan harga jual break-even Ha Pe Pe Bapak itu {hpp_str} per kilo ya. "
-        f"Jangan mau jual di bawah harga Ha Pe Pe. Semangat dan sukses panennya Pak!"
+        f"Biar nggak rugi, patokan harga jual break-even Ha-Pe-Pe Bapak itu {hpp_str} per kilo ya. "
+        f"Jangan mau jual di bawah harga Ha-Pe-Pe. Semangat dan sukses panennya Pak!"
     )
     return script
 
@@ -83,13 +83,13 @@ def synthesize_audio_brief(
     voice_id: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Synthesizes Indonesian audio using ElevenLabs Multilingual V2 TTS API.
+    Synthesizes Indonesian audio using ElevenLabs Turbo V2.5 TTS API.
     Saves MP3 file to output_filename.
     """
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not voice_id:
-        # Default: Antoni (ErXwobaYiN019PkySvjV) - Warm conversational expressive male voice
-        voice_id = os.getenv("ELEVENLABS_VOICE_ID", "ErXwobaYiN019PkySvjV")
+        # Default: George (JBFqnCBsd6RMkjVDRZzb) - Natural, warm, conversational male voice
+        voice_id = os.getenv("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb")
 
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
 
@@ -107,20 +107,25 @@ def synthesize_audio_brief(
         "Content-Type": "application/json",
         "xi-api-key": api_key
     }
+    model_id = os.getenv("ELEVENLABS_MODEL_ID", "eleven_turbo_v2_5")
     payload = {
         "text": script_text,
-        "model_id": "eleven_multilingual_v2",
+        "model_id": model_id,
         "voice_settings": {
             "stability": 0.35,
             "similarity_boost": 0.85,
-            "style": 0.25,
-            "use_speaker_boost": True,
-            "speed": 1.05
+            "style": 0.20,
+            "use_speaker_boost": True
         }
     }
 
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=15)
+        if response.status_code != 200 and model_id == "eleven_turbo_v2_5":
+            # Fallback to eleven_multilingual_v2 if turbo model returns error
+            payload["model_id"] = "eleven_multilingual_v2"
+            response = requests.post(url, json=payload, headers=headers, timeout=15)
+
         if response.status_code == 200:
             with open(output_filename, "wb") as f:
                 f.write(response.content)
@@ -129,7 +134,7 @@ def synthesize_audio_brief(
                 "audio_path": output_filename,
                 "script": script_text,
                 "voice_id": voice_id,
-                "model": "eleven_multilingual_v2"
+                "model": payload["model_id"]
             }
         else:
             return {
