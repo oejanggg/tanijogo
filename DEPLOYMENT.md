@@ -45,28 +45,32 @@ Before deploying the frontend or backend, ensure your Supabase database schema a
 
 ---
 
-## 3. Deployment Option A: Cloud PaaS (Recommended)
+## 3. Deployment Option A: Cloud Hosting (Free Netlify Setup)
 
-### Deploy Frontend to Vercel
+### Deploy Frontend to Netlify (100% Free)
 1. Push your code to GitHub (branch `release/production-ready`).
-2. Go to [Vercel](https://vercel.com) → **Add New Project** → Select repository.
-3. Set **Root Directory** to `WebApps_Demo/jagatani-web`.
-4. Add the Environment Variables:
+2. Go to [Netlify](https://app.netlify.com) and log in with your GitHub account.
+3. Click **Add new site** → **Import an existing project** → Select `oejanggg/tanijogo`.
+4. Configure the build settings (already set via `netlify.toml`):
+   - **Branch**: `release/production-ready`
+   - **Base directory**: `WebApps_Demo/jagatani-web`
+   - **Build command**: `npm run build`
+   - **Publish directory**: `WebApps_Demo/jagatani-web/out`
+5. Under **Site configuration → Environment variables**, add:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_API_URL` (URL of your deployed backend)
-5. Click **Deploy**.
+   - `NEXT_PUBLIC_API_URL` (URL of your backend API)
+6. Click **Deploy site**. Netlify will build and host your site with free SSL at `https://<your-site>.netlify.app`.
 
-### Deploy Backend to Render or Railway
-#### On Render:
+### Deploy Backend to Render (100% Free Tier)
 1. Connect repository to [Render](https://render.com).
-2. Use the included `render.yaml` Blueprint or create a new **Web Service**:
+2. Create a new **Web Service** using the included `render.yaml` Blueprint or:
    - **Runtime**: Python 3.11
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn src.api:app --host 0.0.0.0 --port $PORT`
    - **Health Check Path**: `/health`
-3. Set the Environment Variables listed in Section 2.
-4. Set `ALLOWED_ORIGINS` to your Vercel frontend URL.
+3. Add your environment variables (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, `SUPABASE_URL`, etc.).
+4. Set `ALLOWED_ORIGINS` to your Netlify site URL (e.g. `https://your-site.netlify.app`).
 
 #### On Railway:
 1. In [Railway](https://railway.app), create a new project from your GitHub repo.
