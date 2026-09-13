@@ -12,6 +12,7 @@ import {
   fetchAllReceipts,
   bulkUpdateLedgerReceipts,
   bulkDeleteLedgerReceipts,
+  clearAllReceipts,
   LedgerItem
 } from "../lib/ledger-storage";
 
@@ -138,6 +139,18 @@ export default function ReceiptsPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  const handleResetAll = async () => {
+    if (!window.confirm("Are you sure you want to reset and delete all receipts from the ledger? This cannot be undone.")) return;
+    setActionLoading(true);
+    await clearAllReceipts(user?.id);
+    setLedger([]);
+    setSelectedIds([]);
+    setSelectMode(false);
+    setActionLoading(false);
+    setNotification("All receipts have been reset.");
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const totalExpenses = ledger.reduce((s, r) => s + (r.total_production_cost || 0), 0);
   const totalReward = ledger.reduce((s, r) => s + (r.reward_earned || 0), 0);
   const grouped = groupByMonth(ledger);
@@ -156,19 +169,29 @@ export default function ReceiptsPage() {
             <span className="text-sm font-semibold">Home</span>
           </button>
           {!isLoadingReceipts && ledger.length > 0 && (
-            <button
-              onClick={() => {
-                setSelectMode(!selectMode);
-                setSelectedIds([]);
-              }}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                selectMode
-                  ? "bg-slate-900 text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              {selectMode ? "Cancel Select" : "Bulk Update"}
-            </button>
+            <div className="flex items-center space-x-1.5">
+              <button
+                onClick={handleResetAll}
+                className="px-2.5 py-1 rounded-xl text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 transition-all flex items-center space-x-1"
+                title="Reset all receipts in ledger"
+              >
+                <Trash2 size={12} />
+                <span>Reset All</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectMode(!selectMode);
+                  setSelectedIds([]);
+                }}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                  selectMode
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {selectMode ? "Cancel Select" : "Bulk Update"}
+              </button>
+            </div>
           )}
         </div>
 
@@ -340,7 +363,7 @@ export default function ReceiptsPage() {
                         <div className="px-4 pb-4 space-y-2.5 border-t border-slate-100 pt-3">
                           {row.hpp_per_kg > 0 && (
                             <div className="bg-amber-50 rounded-xl px-3 py-2 flex items-center justify-between border border-amber-100">
-                              <span className="text-xs text-amber-800 font-semibold">Corn HPP / kg</span>
+                              <span className="text-xs text-amber-800 font-semibold">BEP / kg</span>
                               <span className="text-xs font-extrabold text-amber-900">Rp {row.hpp_per_kg.toLocaleString("en-US")}</span>
                             </div>
                           )}
