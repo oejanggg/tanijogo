@@ -1,13 +1,7 @@
 import os
+import requests
 from typing import Dict, Any, Optional
 from src.schemas import ReceiptEvaluation
-
-try:
-    from elevenlabs.client import ElevenLabs
-    from elevenlabs import save
-    HAS_ELEVENLABS_SDK = True
-except ImportError:
-    HAS_ELEVENLABS_SDK = False
 
 
 def generate_farmer_script(
@@ -52,7 +46,7 @@ def synthesize_audio_brief(
     voice_id: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Synthesizes Indonesian audio using ElevenLabs Multilingual V2 model.
+    Synthesizes Indonesian audio using ElevenLabs Multilingual V2 TTS API.
     Saves MP3 file to output_filename.
     """
     api_key = os.getenv("ELEVENLABS_API_KEY")
@@ -61,29 +55,47 @@ def synthesize_audio_brief(
 
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
 
-    if not api_key or api_key.startswith("your_") or not HAS_ELEVENLABS_SDK:
+    if not api_key or api_key.startswith("your_"):
         return {
             "status": "text_only",
             "script": script_text,
-            "reason": "ELEVENLABS_API_KEY not configured. Set ELEVENLABS_API_KEY in .env to generate live MP3 audio."
+            "reason": "ELEVENLABS_API_KEY not configured in .env."
         }
 
-    try:
-        client = ElevenLabs(api_key=api_key)
-        audio = client.generate(
-            text=script_text,
-            voice=voice_id,
-            model="eleven_multilingual_v2"
-        )
-        
-        save(audio, output_filename)
-        return {
-            "status": "success",
-            "audio_path": output_filename,
-            "script": script_text,
-            "voice_id": voice_id,
-            "model": "eleven_multilingual_v2"
+    # Direct ElevenLabs HTTP REST API call for 100% reliability
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+    headers = {
+        "Accept": "audio/mpeg",
+        "Content-Type": "application/json",
+        "xi-api-key": api_key
+    }
+    payload = {
+        "text": script_text,
+        "model_id": "eleven_multilingual_v2",
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75
         }
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        if response.status_code == 200:
+            with open(output_filename, "wb") as f:
+                f.write(response.content)
+            return {
+                "status": "success",
+                "audio_path": output_filename,
+                "script": script_text,
+                "voice_id": voice_id,
+                "model": "eleven_multilingual_v2"
+            }
+        else:
+            return {
+                "status": "error",
+                "script": script_text,
+                "reason": f"ElevenLabs API Error ({response.status_code}): {response.text}"
+            }
     except Exception as e:
         return {
             "status": "error",
