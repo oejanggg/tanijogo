@@ -48,8 +48,8 @@ export default function ReportPage() {
     if (navigator.share) {
       navigator
         .share({
-          title: "SukaTani KUR Credit Report",
-          text: `SukaTani Bank Report: ${validReceipts} verified receipts, Rp ${totalExpenses.toLocaleString("en-US")} confirmed expenses.`,
+          title: "TaniJaga Corn Farmer Credit Report",
+          text: `TaniJaga Corn Report: ${validReceipts} verified receipts, Rp ${totalExpenses.toLocaleString("en-US")} confirmed expenses.`,
         })
         .catch(() => {});
     } else {
@@ -108,12 +108,12 @@ export default function ReportPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-emerald-200/70 text-[9px] font-bold uppercase tracking-widest">
-                  SukaTani Verified
+                  TaniJaga Verified
                 </p>
-                <p className="text-white font-extrabold text-base">Farmer Financial Statement</p>
+                <p className="text-white font-extrabold text-base">Corn Farmer Financial Statement</p>
               </div>
               <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center border border-white/20">
-                <span className="text-xl">🌾</span>
+                <span className="text-xl">🌽</span>
               </div>
             </div>
 

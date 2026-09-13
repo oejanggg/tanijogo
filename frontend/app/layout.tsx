@@ -9,8 +9,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "SukaTani – AI Farm Financial Engine",
-  description: "AI-powered incentive & financial audit platform for Indonesian smallholder farmers.",
+  title: "TaniJaga – AI Farm Financial Engine for Corn Farmers",
+  description: "AI-powered financial audit, HPP calculation, and cash incentives specifically for Indonesian corn farmers.",
 };
 
 export const viewport: Viewport = {

@@ -90,43 +90,59 @@ export default function HarvestPage() {
           <ChevronLeft size={22} />
           <span className="text-sm font-semibold">Home</span>
         </button>
-        <div className="flex items-center space-x-2.5">
-          <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center">
-            <Sprout size={20} className="text-emerald-700" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center text-lg">
+              🌽
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-slate-900">Corn Harvest &amp; Yield</h1>
+              <p className="text-slate-500 text-xs font-medium">TaniJaga Dried Corn (Jagung Pipil) Calculator</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Harvest & Yield</h1>
-            <p className="text-slate-500 text-xs font-medium">Update and track your farm harvest data</p>
-          </div>
+          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+            Standard: 15% Moisture
+          </span>
         </div>
       </header>
 
       <main className="px-4 pt-5 space-y-4">
+        {/* Corn Benchmark Banner */}
+        <div className="bg-amber-50 rounded-2xl p-3.5 border border-amber-200/80 flex items-start space-x-2.5">
+          <span className="text-base">💡</span>
+          <div>
+            <p className="text-xs font-bold text-amber-900">National Corn Benchmark: Rp 5,500 / kg</p>
+            <p className="text-[10px] text-amber-700 leading-relaxed mt-0.5">
+              Government reference price (HAP) for dry corn kernels. Enter your harvest numbers below to ensure your sale price stays safely above your HPP.
+            </p>
+          </div>
+        </div>
+
         {/* Input Form */}
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs space-y-4">
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-              Estimated Harvest Yield (Kg) *
+              Estimated Corn Harvest Yield (Kg) *
             </label>
             <input
               type="number"
-              placeholder="e.g. 1000"
+              placeholder="e.g. 5000"
               value={yieldKg}
               onChange={(e) => setYieldKg(e.target.value)}
               className="w-full border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
             />
             <p className="text-[10px] text-slate-400 font-medium mt-1">
-              This number is divided by total costs to compute your break-even price.
+              Standard yield for 1 hectare hybrid corn (BISI/Pioneer) is ~5,000 kg.
             </p>
           </div>
 
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-              Kg Sold After Harvest
+              Kg Corn Sold After Drying
             </label>
             <input
               type="number"
-              placeholder="e.g. 850"
+              placeholder="e.g. 4800"
               value={soldKg}
               onChange={(e) => setSoldKg(e.target.value)}
               className="w-full border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
@@ -135,7 +151,7 @@ export default function HarvestPage() {
 
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-              Selling Price (per Kg)
+              Corn Selling Price (per Kg)
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-sm">
@@ -143,14 +159,14 @@ export default function HarvestPage() {
               </span>
               <input
                 type="number"
-                placeholder="e.g. 15000"
+                placeholder="e.g. 5500"
                 value={pricePerKg}
                 onChange={(e) => setPricePerKg(e.target.value)}
                 className="w-full border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-3.5 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
               />
             </div>
             <p className="text-[10px] text-slate-400 font-medium mt-1">
-              Average price received per kg sold at market
+              Wholesale price received from collector / feed mill per kg
             </p>
           </div>
 

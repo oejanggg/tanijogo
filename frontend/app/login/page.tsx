@@ -54,7 +54,7 @@ export default function LoginPage() {
             <div className="w-9 h-9 bg-white/15 rounded-xl flex items-center justify-center">
               <Sprout size={20} className="text-emerald-200" />
             </div>
-            <span className="text-white/60 text-sm font-semibold">SukaTani</span>
+            <span className="text-white/60 text-sm font-semibold">TaniJaga</span>
           </div>
           <h1 className="text-3xl font-black text-white tracking-tight">Welcome back!</h1>
           <p className="text-emerald-200/80 text-sm font-medium">Sign in to your farmer account</p>

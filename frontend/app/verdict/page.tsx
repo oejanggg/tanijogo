@@ -139,8 +139,13 @@ export default function VerdictPage() {
           <ChevronLeft size={22} />
           <span className="text-sm font-semibold">Home</span>
         </button>
-        <h1 className="text-xl font-extrabold text-slate-900">Photo Verdict</h1>
-        <p className="text-slate-500 text-xs font-medium mt-0.5">Automated AI farm expense evaluation</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Photo Verdict</h1>
+            <p className="text-slate-500 text-xs font-medium mt-0.5">TaniJaga AI · Corn expense evaluation</p>
+          </div>
+          <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">🌽 Corn</span>
+        </div>
       </header>
 
       <main className="px-4 pt-4 space-y-4">

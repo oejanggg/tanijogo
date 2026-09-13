@@ -6,16 +6,16 @@ from backend.schemas import ReceiptEvaluation, CostItem
 
 
 SYSTEM_PROMPT = """
-You are an agricultural financial auditor processing receipt images for Indonesian smallholder farmers.
+You are TaniJaga, an agricultural financial auditor processing expense and input receipts specifically for Indonesian Corn (Jagung) smallholder farmers.
 
 CRITICAL LANGUAGE INSTRUCTION:
 All output fields (receipt_summary, fraud_flags, item_name, confidence_reasoning) MUST be written in English. Do not write Indonesian sentences in the output.
 
 1. Image Quality (1-10): Assess visual clarity and legibility.
 2. Originality: Flag as false if photo is of a screen, digitally altered, or photocopy. List specific reasons in English in fraud_flags.
-3. Primary Category: Categorize overall transaction as COGS (seeds/fertilizer), OPEX (utilities/labor), CAPEX (machinery/assets), MIXED, or INVALID.
-4. Receipt Summary: Provide a 1-sentence transaction summary in English.
-5. Line Items: Extract each item (translate item names to English, e.g., "Red Chili", "Fertilizer", "Harvest Labor"), convert total price to integer in IDR, and classify as COGS, OPEX, or CAPEX with brief English reasoning.
+3. Primary Category: Categorize overall transaction as COGS (corn seeds/fertilizer/chemicals), OPEX (utilities/tractor tillage/labor), CAPEX (sheller machinery/pumps/tools), MIXED, or INVALID.
+4. Receipt Summary: Provide a 1-sentence transaction summary in English explaining its role in the corn production cycle.
+5. Line Items: Extract each item (translate item names to English, e.g., "Hybrid Corn Seed BISI 18", "Urea Fertilizer", "Tractor Land Preparation", "Corn Sheller Rental"), convert total price to integer in IDR, and classify as COGS, OPEX, or CAPEX with brief English reasoning.
 
 If image is unreadable, unrelated (e.g. restaurant/grocery store chit not farm), or invalid, set primary_receipt_category to "INVALID" and set is_original_receipt to false.
 """
@@ -27,33 +27,47 @@ SIZE_MAP = {}
 
 TRANSLATION_MAP = {
     "pengepul hasil tani": "Farm Harvest Collector",
+    "pengepul jagung": "Corn Wholesale Collector",
     "pengepul bawang": "Shallot Wholesale Collector",
     "toko pertanian": "Agricultural Supplies Store",
     "kios tani": "Farm Input Store",
     "restoran": "Restaurant & Food Service",
     "warung": "Local Diner",
-    "cabai merah keriting": "Curly Red Chili",
-    "cabai rawit merah": "Bird's Eye Red Chili",
-    "bawang merah": "Shallots Grade A",
-    "bawang putih": "Garlic",
     "jagung pipil kering": "Dried Corn Kernels",
-    "gabah kering panen": "Harvested Grain Paddy",
+    "jagung pipil": "Shelled Corn Kernels",
+    "benih jagung": "Hybrid Corn Seeds",
+    "benih jagung hibrida": "Hybrid Corn Seeds",
+    "bibit jagung": "Corn Seeds",
+    "bisi 18": "BISI 18 Hybrid Corn Seeds",
+    "pioneer p35": "Pioneer P35 Corn Seeds",
+    "nk 212": "NK 212 Hybrid Corn Seeds",
     "pupuk urea": "Urea Fertilizer",
-    "pupuk npk": "NPK Fertilizer",
+    "pupuk npk": "NPK Fertilizer (Phonska)",
+    "pupuk phonska": "NPK Phonska Fertilizer",
+    "pupuk kandang": "Organic Manure Fertilizer",
     "bibit": "Seedlings / Seeds",
     "fungisida": "Fungicide Spray",
     "insektisida": "Insecticide Spray",
+    "herbisida": "Corn Weed Herbicide",
+    "gramoxone": "Gramoxone Herbicide",
+    "calaris": "Calaris Corn Herbicide",
+    "pemipil jagung": "Corn Sheller Machine Service",
+    "mesin pemipil": "Corn Sheller Machine",
+    "terpal": "Corn Drying Tarpaulin",
     "sprayer": "Crop Sprayer",
     "pompa air": "Irrigation Water Pump",
-    "traktor": "Hand Tractor",
-    "upah buruh petik": "Harvest Labor Picking Wages",
+    "traktor": "Hand Tractor Land Tillage",
+    "upah buruh petik": "Harvest Labor Wages",
     "upah petik": "Picking Wages",
-    "upah tanam": "Planting Labor Wages",
+    "upah tanam": "Corn Planting Labor Wages",
     "upah olah tanah": "Land Preparation Labor",
-    "potongan susut": "Shrinkage Deduction",
+    "potongan susut": "Moisture & Shrinkage Deduction",
     "refraksi": "Moisture Refraction Deduction",
     "solar": "Diesel Fuel for Machinery",
     "sewa lahan": "Farm Land Lease",
+    "cabai merah keriting": "Curly Red Chili",
+    "cabai rawit merah": "Bird's Eye Red Chili",
+    "bawang merah": "Shallots Grade A",
 }
 
 

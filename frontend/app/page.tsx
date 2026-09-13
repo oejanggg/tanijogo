@@ -34,21 +34,21 @@ export default function LandingPage() {
           </div>
           <div className="text-center space-y-1">
             <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-r from-white via-emerald-100 to-emerald-300 bg-clip-text text-transparent">
-              SukaTani
+              TaniJaga
             </h1>
-            <p className="text-emerald-300/90 text-sm font-semibold tracking-wide uppercase">AI · Audit · Incentive</p>
+            <p className="text-emerald-300/90 text-sm font-semibold tracking-wide uppercase">Corn AI · Audit · Incentive</p>
           </div>
         </div>
 
         <p className="text-emerald-100/80 text-center text-base leading-relaxed max-w-xs font-medium">
-          AI-powered financial engine & incentive platform for Indonesian smallholder farmers
+          AI-powered financial engine &amp; receipt audit platform designed specifically for Indonesian Corn (Jagung) farmers
         </p>
 
         <div className="w-full space-y-2.5">
           {[
-            { icon: Shield, text: "Audit farm receipts with Gemini AI" },
-            { icon: TrendingUp, text: "Calculate HPP break-even price automatically" },
-            { icon: Mic, text: "English voice summary via ElevenLabs AI" },
+            { icon: Shield, text: "Audit corn farm receipts & bulk upload batches" },
+            { icon: TrendingUp, text: "Real-time break-even HPP vs. Rp 5,500/kg corn price" },
+            { icon: Mic, text: "English voice briefs via ElevenLabs AI" },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="bg-white/8 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/10 flex items-center space-x-3">
               <div className="w-8 h-8 bg-emerald-500/25 rounded-xl flex items-center justify-center shrink-0">

@@ -15,7 +15,8 @@ export interface LedgerItem {
   audio_url?: string | null;
 }
 
-const STORAGE_KEY = "sukatani_farmer_ledger";
+const STORAGE_KEY = "tanijaga_farmer_ledger";
+const LEGACY_STORAGE_KEY = "sukatani_farmer_ledger";
 
 /**
  * Get all locally persisted receipts from localStorage.
@@ -23,7 +24,15 @@ const STORAGE_KEY = "sukatani_farmer_ledger";
 export function getLocalReceipts(): LedgerItem[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      // Check legacy key and migrate if found
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy) {
+        localStorage.setItem(STORAGE_KEY, legacy);
+        raw = legacy;
+      }
+    }
     if (!raw) return [];
     return JSON.parse(raw);
   } catch (e) {
@@ -79,6 +88,39 @@ export async function saveLedgerReceipt(entry: LedgerItem): Promise<LedgerItem> 
 }
 
 /**
+ * Saves multiple receipts simultaneously into localStorage and Supabase.
+ */
+export async function saveLedgerReceiptsBatch(entries: LedgerItem[]): Promise<LedgerItem[]> {
+  if (!entries || entries.length === 0) return [];
+  const current = getLocalReceipts();
+  const entryIds = new Set(entries.map((e) => e.id));
+  const filtered = current.filter((r) => !entryIds.has(r.id));
+  const updated = [...entries, ...filtered];
+  setLocalReceipts(updated);
+
+  try {
+    const payloads = entries.map((entry) => {
+      const p: any = {
+        merchant_name: entry.merchant_name,
+        primary_category: entry.primary_category,
+        quality_score: entry.quality_score,
+        reward_earned: entry.reward_earned,
+        total_production_cost: entry.total_production_cost,
+        hpp_per_kg: entry.hpp_per_kg,
+        fraud_detected: entry.fraud_detected,
+      };
+      if (entry.user_id) p.user_id = entry.user_id;
+      return p;
+    });
+    await supabase.from("farmer_ledger").insert(payloads);
+  } catch (e) {
+    console.warn("Supabase batch sync warning (saved locally):", e);
+  }
+
+  return entries;
+}
+
+/**
  * Updates an existing receipt (e.g. category classification or cost confirmation).
  */
 export async function updateLedgerReceipt(
@@ -102,6 +144,53 @@ export async function updateLedgerReceipt(
     await supabase.from("farmer_ledger").update(remoteUpdates).eq("id", id);
   } catch (e) {
     console.warn("Supabase update warning:", e);
+  }
+}
+
+/**
+ * Bulk updates multiple receipts at once (e.g. bulk category change).
+ */
+export async function bulkUpdateLedgerReceipts(
+  ids: string[],
+  updates: Partial<LedgerItem>
+): Promise<void> {
+  if (!ids || ids.length === 0) return;
+  const idSet = new Set(ids);
+  const current = getLocalReceipts();
+  const updated = current.map((item) => {
+    if (idSet.has(item.id)) {
+      return { ...item, ...updates };
+    }
+    return item;
+  });
+  setLocalReceipts(updated);
+
+  try {
+    const remoteUpdates: any = {};
+    if (updates.primary_category !== undefined) remoteUpdates.primary_category = updates.primary_category;
+    if (updates.total_production_cost !== undefined) remoteUpdates.total_production_cost = updates.total_production_cost;
+    if (updates.hpp_per_kg !== undefined) remoteUpdates.hpp_per_kg = updates.hpp_per_kg;
+
+    await supabase.from("farmer_ledger").update(remoteUpdates).in("id", ids);
+  } catch (e) {
+    console.warn("Supabase bulk update warning:", e);
+  }
+}
+
+/**
+ * Bulk deletes multiple receipts from localStorage and Supabase.
+ */
+export async function bulkDeleteLedgerReceipts(ids: string[]): Promise<void> {
+  if (!ids || ids.length === 0) return;
+  const idSet = new Set(ids);
+  const current = getLocalReceipts();
+  const remaining = current.filter((r) => !idSet.has(r.id));
+  setLocalReceipts(remaining);
+
+  try {
+    await supabase.from("farmer_ledger").delete().in("id", ids);
+  } catch (e) {
+    console.warn("Supabase bulk delete warning:", e);
   }
 }
 

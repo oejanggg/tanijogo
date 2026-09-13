@@ -2,6 +2,10 @@ from typing import Dict, Any
 from backend.schemas import ReceiptEvaluation, CostItem
 
 
+CORN_MARKET_BENCHMARK_IDR = 5500  # Badan Pangan Nasional benchmark for dried corn kernels (Rp/kg)
+DEFAULT_CORN_YIELD_KG = 5000.0   # Standard hybrid corn yield per hectare
+
+
 def calculate_reward(evaluation: ReceiptEvaluation, base_reward_idr: int = 5000) -> int:
     """
     Calculates micro-cash incentive reward based on image quality score.
@@ -16,7 +20,7 @@ def calculate_reward(evaluation: ReceiptEvaluation, base_reward_idr: int = 5000)
 
 def calculate_hpp(
     evaluation: ReceiptEvaluation,
-    estimated_yield_kg: float,
+    estimated_yield_kg: float = DEFAULT_CORN_YIELD_KG,
     amortization_cycles: int = 24
 ) -> Dict[str, Any]:
     """

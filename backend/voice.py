@@ -56,13 +56,37 @@ def generate_farmer_script(
 
     return (
         f"Great news, {farmer_name}! "
-        f"Your receipt from {merchant} has been verified by SukaTani AI. "
+        f"Your receipt from {merchant} has been verified by TaniJaga AI. "
         f"Image quality score: {score} out of 10. "
         f"Your cash incentive of {payout_str} has been credited to your wallet. "
         f"Total production cost recorded: {cost_str}. "
-        f"Your break-even price is {hpp_str} per kilogram. "
-        f"Do not sell below this price, or you will lose money. "
-        f"Great work! Keep uploading your receipts to build your KUR credit report."
+        f"Your break-even price for dried corn is {hpp_str} per kilogram. "
+        f"Keep your selling price above this mark to secure a solid harvest profit. "
+        f"Great work! Keep uploading your corn receipts to build your TaniJaga credit profile."
+    )
+
+
+def generate_batch_farmer_script(
+    total_processed: int,
+    total_reward_idr: int,
+    total_production_cost_idr: int,
+    aggregated_hpp_idr: int,
+    farmer_name: str = "Farmer"
+) -> str:
+    """
+    Generates a high-level summary audio brief for a batch of uploaded corn receipts.
+    """
+    reward_str = format_idr_english(total_reward_idr)
+    cost_str = format_idr_english(total_production_cost_idr)
+    hpp_str = format_idr_english(aggregated_hpp_idr)
+
+    return (
+        f"Hello {farmer_name}! "
+        f"TaniJaga AI has successfully processed your batch of {total_processed} farm receipts. "
+        f"You earned a total incentive reward of {reward_str}. "
+        f"Total recorded production expenses: {cost_str}. "
+        f"Your updated corn break-even price is {hpp_str} per kilogram. "
+        f"All records are now verified and added to your TaniJaga farm ledger."
     )
 
 
