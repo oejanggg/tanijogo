@@ -59,9 +59,9 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 max-w-md mx-auto pb-24 font-sans">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-100 px-5 pt-12 pb-4">
+    <div className="min-h-dvh bg-slate-50 max-w-md mx-auto pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] font-sans">
+      {/* Header with iPhone safe area awareness */}
+      <header className="bg-white border-b border-slate-100 px-4 sm:px-5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+0.75rem))] pb-4 sticky top-0 z-20">
         <button
           onClick={() => router.push("/home")}
           className="flex items-center space-x-1 text-slate-600 hover:text-emerald-700 mb-3 transition-colors"

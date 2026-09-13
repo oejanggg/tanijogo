@@ -278,7 +278,7 @@ export default function VerdictPage() {
                 <p className="font-extrabold text-slate-900">Rp {(financials.total_production_cost || record.total_amount_idr || 0).toLocaleString("en-US")}</p>
               </div>
               <div className="flex items-center justify-between py-2.5 border-b border-slate-100">
-                <p className="text-sm font-semibold text-slate-700">HPP / kg</p>
+                <p className="text-sm font-semibold text-slate-700">BEP / kg</p>
                 <p className="font-extrabold text-emerald-700">Rp {(financials.hpp_per_kg || record.hpp_per_kg_idr || 0).toLocaleString("en-US")}</p>
               </div>
               <div className="flex items-center justify-between py-2">

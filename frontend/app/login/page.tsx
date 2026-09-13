@@ -43,13 +43,8 @@ export default function LoginPage() {
   if (authLoading) return null;
 
   return (
-<<<<<<< Updated upstream
-    <div className="min-h-screen bg-slate-50 max-w-md mx-auto flex flex-col">
-      <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-800 pt-12 pb-20 px-5 relative overflow-hidden">
-=======
-    <div className="min-h-dvh bg-slate-50 w-full max-w-md mx-auto flex flex-col">
+    <div className="min-h-dvh bg-slate-50 max-w-md mx-auto flex flex-col">
       <div className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-800 pt-[max(2.5rem,calc(env(safe-area-inset-top)+0.75rem))] pb-16 px-5 relative overflow-hidden">
->>>>>>> Stashed changes
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
         <button onClick={() => router.back()} className="text-emerald-200/80 mb-8 hover:text-white transition-colors">
           <ChevronLeft size={26} />
@@ -66,7 +61,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex-1 px-5 -mt-12 z-10 pb-8">
+      <div className="flex-1 px-5 -mt-12 z-10">
         <div className="bg-white rounded-3xl shadow-xl border border-slate-100/80 p-6">
           <h2 className="text-lg font-bold text-slate-800 mb-5">Sign in</h2>
 

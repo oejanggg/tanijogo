@@ -9,20 +9,22 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "TaniJaga – AI Farm Financial Engine for Corn Farmers",
-  description: "AI-powered financial audit, HPP calculation, and cash incentives specifically for Indonesian corn farmers.",
+  title: "TaniJaga – Farmer's Cost Ledger",
+  description: "Farmer's Cost Ledger, BEP calculation, and receipt audit platform for Indonesian smallholder farmers.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover",
+  userScalable: false,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-slate-50">
+      <body className="min-h-dvh flex flex-col bg-slate-50 overscroll-none">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

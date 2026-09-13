@@ -38,10 +38,17 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // 1. Create auth user
+    // 1. Create auth user with dynamic confirmation redirect
+    const redirectUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/email-confirmed`
+      : undefined;
+
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
     });
 
     if (signUpError) {
@@ -61,7 +68,7 @@ export default function SignupPage() {
     }
 
     setSuccess(true);
-    setTimeout(() => router.push("/home"), 1500);
+    setLoading(false);
   };
 
   const fields: { key: keyof FormData; label: string; type?: string }[] = [
@@ -73,8 +80,61 @@ export default function SignupPage() {
 
   if (authLoading) return null;
 
+  // Email Confirmation State
+  if (success) {
+    return (
+      <div className="min-h-dvh bg-slate-50 max-w-md mx-auto flex flex-col justify-center px-6 py-12">
+        <div className="bg-white rounded-3xl p-7 shadow-xl border border-slate-100 text-center space-y-5 animate-scale-up">
+          <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-md shadow-emerald-500/15">
+            📬
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Confirm Your Email</h1>
+            <p className="text-slate-600 text-xs leading-relaxed">
+              We&apos;ve sent a verification link to:
+            </p>
+            <p className="font-extrabold text-emerald-800 text-sm bg-emerald-50 py-1.5 px-3 rounded-xl inline-block border border-emerald-200/60">
+              {form.email}
+            </p>
+          </div>
+
+          <div className="bg-slate-50 rounded-2xl p-4 text-left border border-slate-100 space-y-1.5 text-xs text-slate-500">
+            <p className="font-bold text-slate-700">Next steps:</p>
+            <p className="flex items-start space-x-2">
+              <span>1.</span>
+              <span>Open your email app and click the confirmation link.</span>
+            </p>
+            <p className="flex items-start space-x-2">
+              <span>2.</span>
+              <span>Once confirmed, sign in below to start auditing receipts.</span>
+            </p>
+          </div>
+
+          <div className="space-y-2.5 pt-2">
+            <button
+              onClick={() => router.push("/login")}
+              className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-4 rounded-2xl font-extrabold text-sm shadow-lg shadow-emerald-700/25 active:scale-[0.98] transition-all"
+            >
+              Sign In to Your Account
+            </button>
+            <button
+              onClick={() => {
+                setSuccess(false);
+                setForm({ firstName: "", lastName: "", email: "", phone: "", password: "" });
+              }}
+              className="w-full text-slate-500 hover:text-slate-700 text-xs font-semibold py-2"
+            >
+              Use a different email
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 max-w-md mx-auto">
+    <div className="min-h-dvh bg-slate-50 max-w-md mx-auto">
       <div className="px-5 pt-14 pb-10">
         <button onClick={() => router.back()}
           className="text-slate-600 hover:text-emerald-700 mb-7 flex items-center transition-colors">
@@ -90,13 +150,6 @@ export default function SignupPage() {
           <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center space-x-2.5 mb-4">
             <AlertCircle size={16} className="text-red-600 shrink-0" />
             <p className="text-red-700 text-xs font-semibold">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center space-x-2.5 mb-4">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <p className="text-emerald-700 text-xs font-semibold">Account created! Redirecting to home...</p>
           </div>
         )}
 
