@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Upload, Wallet, AlertTriangle, CheckCircle2, Receipt, Volume2 } from 'lucide-react';
+import { Upload, Wallet, AlertTriangle, CheckCircle2, Receipt, Volume2, Play } from 'lucide-react';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -10,6 +10,7 @@ export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [ledger, setLedger] = useState<any[]>([]);
   const [walletBalance, setWalletBalance] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Fetch historical data on mount
   useEffect(() => {
@@ -84,6 +85,25 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Spoken Speech Synthesizer for immediate voice output
+  const handlePlaySpeech = (text: str) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      alert("Speech Synthesis is not supported in this browser.");
+      return;
+    }
+
+    window.speechSynthesis.cancel(); // Stop any previous playback
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID'; // Indonesian accent
+    utterance.rate = 0.95;
+
+    utterance.onstart = () => setIsPlaying(true);
+    utterance.onend = () => setIsPlaying(false);
+    utterance.onerror = () => setIsPlaying(false);
+
+    window.speechSynthesis.speak(utterance);
   };
 
   return (
@@ -164,24 +184,35 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Spoken Indonesian Voice Brief (ElevenLabs Integration) */}
+                {/* Spoken Indonesian Voice Brief (ElevenLabs + Speech Output) */}
                 {voice.transcript && (
-                  <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <div className="flex items-center justify-between mb-2">
+                  <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 space-y-3">
+                    <div className="flex items-center justify-between">
                       <span className="flex items-center text-purple-900 font-bold text-sm">
-                        <Volume2 size={18} className="mr-1 text-purple-600" /> Audio Brief (Pak Joko)
+                        <Volume2 size={18} className="mr-1.5 text-purple-600" /> Audio Brief (Pak Joko)
                       </span>
                       <span className="text-[10px] uppercase tracking-wider font-bold bg-purple-200 text-purple-800 px-2 py-0.5 rounded">
                         Built with ElevenLabs
                       </span>
                     </div>
-                    <p className="text-xs text-purple-900 leading-relaxed italic bg-white/60 p-2.5 rounded-lg border border-purple-100">
+
+                    <p className="text-xs text-purple-900 leading-relaxed italic bg-white/70 p-3 rounded-lg border border-purple-100">
                       "{voice.transcript}"
                     </p>
+
+                    {/* Interactive Spoken Voice Player Button */}
+                    <button
+                      onClick={() => handlePlaySpeech(voice.transcript)}
+                      className="w-full flex items-center justify-center space-x-2 bg-purple-600 text-white py-2.5 px-4 rounded-lg font-bold text-sm hover:bg-purple-700 transition-colors shadow-sm"
+                    >
+                      <Play size={16} className={isPlaying ? "animate-spin" : ""} />
+                      <span>{isPlaying ? "Speaking Brief..." : "🔊 Dengarkan Voice Brief (Suara)"}</span>
+                    </button>
+
+                    {/* Native MP3 Audio Player if ElevenLabs API Key is present */}
                     {audioSrc && (
-                      <audio controls className="w-full mt-3 h-8 rounded-lg">
+                      <audio controls className="w-full mt-2 h-8 rounded-lg">
                         <source src={audioSrc} type="audio/mpeg" />
-                        Your browser does not support the audio element.
                       </audio>
                     )}
                   </div>
