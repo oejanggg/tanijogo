@@ -2,21 +2,74 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, TrendingUp, TrendingDown, Sprout, Loader2, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, TrendingUp, TrendingDown, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useProtected } from "../lib/use-protected";
 import BottomNav from "../components/BottomNav";
+
+type CommodityType = "corn" | "chili" | "rice";
+
+interface CommodityConfig {
+  id: CommodityType;
+  name: string;
+  shortName: string;
+  icon: string;
+  unit: string;
+  standardYield: number;
+  benchmarkPrice: number;
+  standardQuality: string;
+  yieldHelp: string;
+}
+
+const COMMODITY_OPTIONS: Record<CommodityType, CommodityConfig> = {
+  corn: {
+    id: "corn",
+    name: "Dried Corn (Jagung Pipil)",
+    shortName: "Corn",
+    icon: "🌽",
+    unit: "kg dry kernel",
+    standardYield: 5000,
+    benchmarkPrice: 5500,
+    standardQuality: "15% Moisture",
+    yieldHelp: "Standard yield for 1 hectare hybrid corn (BISI/Pioneer) is ~5,000 kg.",
+  },
+  chili: {
+    id: "chili",
+    name: "Red Chili (Cabai Merah)",
+    shortName: "Chili",
+    icon: "🌶️",
+    unit: "kg fresh chili",
+    standardYield: 1200,
+    benchmarkPrice: 32000,
+    standardQuality: "Grade A Keriting",
+    yieldHelp: "Average yield for 1 hectare open-field red chili is ~1,200 - 1,500 kg.",
+  },
+  rice: {
+    id: "rice",
+    name: "Milled Grain (Padi / Gabah)",
+    shortName: "Rice",
+    icon: "🌾",
+    unit: "kg dry grain (GKG)",
+    standardYield: 5500,
+    benchmarkPrice: 7200,
+    standardQuality: "Dry Grain GKG",
+    yieldHelp: "Standard yield for 1 hectare irrigated lowland rice is ~5,000 - 6,000 kg.",
+  },
+};
 
 export default function HarvestPage() {
   const router = useRouter();
   const { user } = useProtected();
 
+  const [selectedCrop, setSelectedCrop] = useState<CommodityType>("corn");
   const [yieldKg, setYieldKg] = useState("");
   const [soldKg, setSoldKg] = useState("");
   const [pricePerKg, setPricePerKg] = useState("");
   const [hppPerKg, setHppPerKg] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const activeCrop = COMMODITY_OPTIONS[selectedCrop];
 
   useEffect(() => {
     const h = localStorage.getItem("lastHpp");
@@ -25,14 +78,13 @@ export default function HarvestPage() {
     if (y) setYieldKg(y);
 
     if (user) {
-      // Load latest harvest record from Supabase if available
       supabase
         .from("harvest_records")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1)
-        .then(({ data, error }) => {
+        .then(({ data }) => {
           if (data && data.length > 0) {
             const r = data[0];
             if (r.yield_kg) setYieldKg(String(r.yield_kg));
@@ -43,12 +95,20 @@ export default function HarvestPage() {
     }
   }, [user]);
 
+  const handleCropSwitch = (crop: CommodityType) => {
+    setSelectedCrop(crop);
+    const target = COMMODITY_OPTIONS[crop];
+    if (!yieldKg) setYieldKg(String(target.standardYield));
+    if (!pricePerKg) setPricePerKg(String(target.benchmarkPrice));
+  };
+
   const yieldNum = parseFloat(yieldKg) || 0;
   const soldNum = parseFloat(soldKg) || 0;
   const priceNum = parseFloat(pricePerKg) || 0;
 
+  const effectiveHpp = hppPerKg && hppPerKg > 0 ? hppPerKg : (activeCrop.benchmarkPrice * 0.76);
   const actualRevenue = soldNum * priceNum;
-  const breakEvenRevenue = yieldNum * (hppPerKg || 0);
+  const breakEvenRevenue = yieldNum * effectiveHpp;
   const profitLoss = actualRevenue - breakEvenRevenue;
   const isProfitable = profitLoss >= 0;
   const hasResult = yieldNum > 0 && soldNum > 0 && priceNum > 0;
@@ -80,78 +140,106 @@ export default function HarvestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 max-w-md mx-auto pb-24 font-sans">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-100 px-5 pt-12 pb-4">
+    <div className="min-h-dvh bg-slate-50 max-w-md mx-auto pb-[calc(6.5rem+env(safe-area-inset-bottom,0px))] font-sans">
+      {/* Header with iPhone safe area top */}
+      <header className="bg-white border-b border-slate-100 px-4 sm:px-5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+0.75rem))] pb-4 sticky top-0 z-20">
         <button
           onClick={() => router.push("/home")}
-          className="flex items-center space-x-1 text-slate-600 hover:text-emerald-700 mb-3 transition-colors"
+          className="flex items-center space-x-1 text-slate-600 hover:text-emerald-700 mb-2.5 transition-colors"
         >
-          <ChevronLeft size={22} />
+          <ChevronLeft size={20} />
           <span className="text-sm font-semibold">Home</span>
         </button>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center text-lg">
-              🌽
+          <div className="flex items-center space-x-2.5 min-w-0">
+            <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center text-lg shrink-0">
+              {activeCrop.icon}
             </div>
-            <div>
-              <h1 className="text-xl font-extrabold text-slate-900">Corn Harvest &amp; Yield</h1>
-              <p className="text-slate-500 text-xs font-medium">TaniJaga Dried Corn (Jagung Pipil) Calculator</p>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-extrabold text-slate-900 truncate">
+                Harvest &amp; Yield Outcome
+              </h1>
+              <p className="text-slate-500 text-xs font-medium truncate">
+                {activeCrop.name} Margin Calculator
+              </p>
             </div>
           </div>
-          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-            Standard: 15% Moisture
+          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full shrink-0">
+            {activeCrop.standardQuality}
           </span>
         </div>
       </header>
 
-      <main className="px-4 pt-5 space-y-4">
-        {/* Corn Benchmark Banner */}
+      <main className="px-4 pt-4 space-y-4">
+        {/* Commodity Selector Switcher */}
+        <div className="bg-white rounded-2xl p-1.5 border border-slate-200/80 shadow-xs flex items-center space-x-1">
+          {(["corn", "chili", "rice"] as CommodityType[]).map((cid) => {
+            const item = COMMODITY_OPTIONS[cid];
+            const active = selectedCrop === cid;
+            return (
+              <button
+                key={cid}
+                onClick={() => handleCropSwitch(cid)}
+                className={`flex-1 flex items-center justify-center space-x-1.5 py-2 px-2 rounded-xl text-xs font-extrabold transition-all ${
+                  active
+                    ? "bg-emerald-800 text-white shadow-sm shadow-emerald-900/20"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                }`}
+              >
+                <span className="text-sm">{item.icon}</span>
+                <span className="truncate">{item.shortName}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Commodity Benchmark Banner */}
         <div className="bg-amber-50 rounded-2xl p-3.5 border border-amber-200/80 flex items-start space-x-2.5">
-          <span className="text-base">💡</span>
+          <span className="text-base shrink-0">💡</span>
           <div>
-            <p className="text-xs font-bold text-amber-900">National Corn Benchmark: Rp 5,500 / kg</p>
+            <p className="text-xs font-bold text-amber-900">
+              National {activeCrop.shortName} Benchmark: Rp {activeCrop.benchmarkPrice.toLocaleString()} / kg
+            </p>
             <p className="text-[10px] text-amber-700 leading-relaxed mt-0.5">
-              Government reference price (HAP) for dry corn kernels. Enter your harvest numbers below to ensure your sale price stays safely above your HPP.
+              Government reference price. Enter your harvest numbers below to ensure your wholesale selling price stays safely above your HPP.
             </p>
           </div>
         </div>
 
         {/* Input Form */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs space-y-4">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 shadow-xs space-y-4">
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-              Estimated Corn Harvest Yield (Kg) *
+              Estimated {activeCrop.shortName} Harvest Yield ({activeCrop.unit}) *
             </label>
             <input
               type="number"
-              placeholder="e.g. 5000"
+              placeholder={`e.g. ${activeCrop.standardYield}`}
               value={yieldKg}
               onChange={(e) => setYieldKg(e.target.value)}
-              className="w-full border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
+              className="w-full border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
             />
             <p className="text-[10px] text-slate-400 font-medium mt-1">
-              Standard yield for 1 hectare hybrid corn (BISI/Pioneer) is ~5,000 kg.
+              {activeCrop.yieldHelp}
             </p>
           </div>
 
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-              Kg Corn Sold After Drying
+              Kg {activeCrop.shortName} Sold
             </label>
             <input
               type="number"
-              placeholder="e.g. 4800"
+              placeholder={`e.g. ${Math.round(activeCrop.standardYield * 0.95)}`}
               value={soldKg}
               onChange={(e) => setSoldKg(e.target.value)}
-              className="w-full border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
+              className="w-full border border-slate-200 bg-slate-50/50 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
             />
           </div>
 
           <div>
             <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-              Corn Selling Price (per Kg)
+              Selling Price (per kg)
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold text-sm">
@@ -159,14 +247,14 @@ export default function HarvestPage() {
               </span>
               <input
                 type="number"
-                placeholder="e.g. 5500"
+                placeholder={`e.g. ${activeCrop.benchmarkPrice}`}
                 value={pricePerKg}
                 onChange={(e) => setPricePerKg(e.target.value)}
-                className="w-full border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-3.5 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
+                className="w-full border border-slate-200 bg-slate-50/50 rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
               />
             </div>
             <p className="text-[10px] text-slate-400 font-medium mt-1">
-              Wholesale price received from collector / feed mill per kg
+              Price received from collector, trader, or off-taker
             </p>
           </div>
 
@@ -186,13 +274,13 @@ export default function HarvestPage() {
                 <span>✓ Saved to Database!</span>
               </>
             ) : (
-              <span>Save & Calculate Break-even</span>
+              <span>Save &amp; Calculate Break-even</span>
             )}
           </button>
         </div>
 
         {/* Season Result */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-xs space-y-3">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-100 shadow-xs space-y-3">
           <div>
             <h2 className="font-extrabold text-slate-800 text-sm">Season Financial Result</h2>
             <p className="text-[10px] text-slate-500 font-medium mt-0.5">
@@ -211,89 +299,56 @@ export default function HarvestPage() {
             >
               <div className="flex items-center space-x-2">
                 {isProfitable ? (
-                  <TrendingUp size={22} className="text-emerald-700" />
+                  <TrendingUp size={22} className="text-emerald-700 shrink-0" />
                 ) : (
-                  <TrendingDown size={22} className="text-red-600" />
+                  <TrendingDown size={22} className="text-red-600 shrink-0" />
                 )}
                 <p
                   className={
                     "font-extrabold text-base " +
-                    (isProfitable ? "text-emerald-900" : "text-red-800")
+                    (isProfitable ? "text-emerald-800" : "text-red-700")
                   }
                 >
-                  {isProfitable ? "✅ Profitable Season!" : "⚠️ Season Loss"}
+                  {isProfitable
+                    ? `Estimated Profit: +Rp ${profitLoss.toLocaleString("en-US")}`
+                    : `Estimated Deficit: -Rp ${Math.abs(profitLoss).toLocaleString("en-US")}`}
                 </p>
               </div>
 
-              <div className="space-y-2">
-                {[
-                  {
-                    label: "Actual Revenue",
-                    value: actualRevenue,
-                    color: isProfitable ? "text-emerald-800" : "text-red-700",
-                  },
-                  {
-                    label: "Break-even Target",
-                    value: breakEvenRevenue,
-                    color: "text-slate-700",
-                  },
-                  {
-                    label: isProfitable ? "Net Profit" : "Net Loss",
-                    value: Math.abs(profitLoss),
-                    color: isProfitable ? "text-emerald-700" : "text-red-600",
-                  },
-                ].map(({ label, value, color }) => (
-                  <div
-                    key={label}
-                    className="flex items-center justify-between py-1.5 border-b border-white/60 last:border-0"
-                  >
-                    <span className="text-xs font-semibold text-slate-600">{label}</span>
-                    <span className={"font-extrabold text-sm " + color}>
-                      {isProfitable && label.includes("Profit") ? "+" : ""}
-                      {!isProfitable && label.includes("Loss") ? "-" : ""}
-                      Rp {value.toLocaleString("en-US")}
-                    </span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 gap-2 text-xs border-t border-slate-200/60 pt-3">
+                <div>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">Actual Revenue</span>
+                  <p className="font-bold text-slate-900 mt-0.5">
+                    Rp {actualRevenue.toLocaleString("en-US")}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">Break-even Cost</span>
+                  <p className="font-bold text-slate-900 mt-0.5">
+                    Rp {breakEvenRevenue.toLocaleString("en-US")}
+                  </p>
+                </div>
               </div>
 
-              <div
+              <p
                 className={
-                  "text-center py-3 rounded-xl font-extrabold text-sm " +
-                  (isProfitable
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-red-100 text-red-800")
+                  "text-xs leading-relaxed font-semibold " +
+                  (isProfitable ? "text-emerald-900" : "text-red-800")
                 }
               >
                 {isProfitable
-                  ? `🎉 You made Rp ${profitLoss.toLocaleString("en-US")} profit this season!`
-                  : `Loss of Rp ${Math.abs(profitLoss).toLocaleString("en-US")} — sell above break-even price!`}
-              </div>
+                  ? `🎉 Excellent work! Your selling price (Rp ${priceNum.toLocaleString()}/kg) exceeds your break-even cost (Rp ${Math.round(effectiveHpp).toLocaleString()}/kg).`
+                  : `⚠️ Your selling price (Rp ${priceNum.toLocaleString()}/kg) is below your break-even cost (Rp ${Math.round(effectiveHpp).toLocaleString()}/kg). Review receipts to identify cost drivers.`}
+              </p>
             </div>
           ) : (
-            <div className="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-8 text-center space-y-2">
-              <p className="text-slate-400 text-sm font-semibold">Enter harvest data above</p>
-              <p className="text-slate-400 text-xs font-medium">
-                Your season financial outcome will appear here
-              </p>
+            <div className="bg-slate-50 rounded-2xl p-4 text-center border border-slate-100 text-slate-400 text-xs font-medium">
+              Fill in yield and price details above to calculate your net season margin.
             </div>
           )}
         </div>
-
-        {hasResult && (
-          <div className="bg-slate-50 rounded-2xl px-4 py-3 border border-slate-200 flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-700">Did this season make money?</p>
-            <span
-              className={
-                "font-extrabold text-sm " +
-                (isProfitable ? "text-emerald-600" : "text-red-600")
-              }
-            >
-              {isProfitable ? "Profitable" : "Loss"} — Rp {Math.abs(profitLoss).toLocaleString("en-US")}
-            </span>
-          </div>
-        )}
       </main>
+
       <BottomNav />
     </div>
   );

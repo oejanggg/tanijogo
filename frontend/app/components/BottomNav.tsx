@@ -14,8 +14,8 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 shadow-[0_-4px_24px_0_rgba(0,0,0,0.06)]">
-      <div className="flex items-center justify-around py-2 px-2">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 shadow-[0_-4px_24px_0_rgba(0,0,0,0.06)] pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-1">
+      <div className="flex items-center justify-around px-2">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (

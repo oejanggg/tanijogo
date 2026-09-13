@@ -5,6 +5,51 @@ from backend.schemas import ReceiptEvaluation, CostItem
 CORN_MARKET_BENCHMARK_IDR = 5500  # Badan Pangan Nasional benchmark for dried corn kernels (Rp/kg)
 DEFAULT_CORN_YIELD_KG = 5000.0   # Standard hybrid corn yield per hectare
 
+COMMODITY_CONFIG = {
+    "corn": {
+        "id": "corn",
+        "name": "Corn (Jagung Pipil Kering)",
+        "short_name": "Corn",
+        "emoji": "🌽",
+        "market_benchmark_idr": 5500,
+        "default_yield_kg": 5000.0,
+        "unit": "kg",
+        "history_3m": [
+            {"month": "Jul 2026", "market_price": 5200, "hpp": 4100},
+            {"month": "Aug 2026", "market_price": 5400, "hpp": 4350},
+            {"month": "Sep 2026", "market_price": 5500, "hpp": 4200},
+        ]
+    },
+    "chili": {
+        "id": "chili",
+        "name": "Red Chili (Cabai Merah Keriting)",
+        "short_name": "Chili",
+        "emoji": "🌶️",
+        "market_benchmark_idr": 32000,
+        "default_yield_kg": 1200.0,
+        "unit": "kg",
+        "history_3m": [
+            {"month": "Jul 2026", "market_price": 28500, "hpp": 22000},
+            {"month": "Aug 2026", "market_price": 34000, "hpp": 24500},
+            {"month": "Sep 2026", "market_price": 32000, "hpp": 21800},
+        ]
+    },
+    "rice": {
+        "id": "rice",
+        "name": "Rice (Gabah Kering Panen)",
+        "short_name": "Rice",
+        "emoji": "🌾",
+        "market_benchmark_idr": 7200,
+        "default_yield_kg": 5500.0,
+        "unit": "kg",
+        "history_3m": [
+            {"month": "Jul 2026", "market_price": 6900, "hpp": 5200},
+            {"month": "Aug 2026", "market_price": 7100, "hpp": 5400},
+            {"month": "Sep 2026", "market_price": 7200, "hpp": 5100},
+        ]
+    }
+}
+
 
 def calculate_reward(evaluation: ReceiptEvaluation, base_reward_idr: int = 5000) -> int:
     """

@@ -16,6 +16,7 @@ from backend.financial_engine import (
     calculate_hpp,
     DEFAULT_CORN_YIELD_KG,
     CORN_MARKET_BENCHMARK_IDR,
+    COMMODITY_CONFIG,
 )
 from backend.db import save_receipt_evaluation, get_supabase_client
 from backend.voice import (
@@ -69,10 +70,18 @@ def compute_receipt_content_fingerprint(evaluation: ReceiptEvaluation) -> str:
 async def root():
     return {
         "app": "TaniJaga Financial Intelligence API",
-        "commodity": "Corn (Jagung Pipil Kering)",
-        "corn_benchmark_price_idr": CORN_MARKET_BENCHMARK_IDR,
+        "supported_commodities": ["corn", "chili", "rice"],
         "status": "online",
         "docs": "/docs"
+    }
+
+
+@app.get("/api/v1/commodities")
+async def list_commodities():
+    """Returns supported staple commodities (Corn, Chili, Rice) with benchmarks, yields, and 3-month price histories."""
+    return {
+        "status": "success",
+        "commodities": list(COMMODITY_CONFIG.values())
     }
 
 

@@ -6,9 +6,9 @@ import { useProtected } from "../lib/use-protected";
 import { useAuth } from "../lib/auth-context";
 import {
   Wallet, Camera, Image as ImageIcon, Volume2, TrendingUp,
-  TrendingDown, ChevronRight, Sprout, LogOut, StopCircle,
-  HelpCircle, Sparkles, Layers, CheckCircle2, AlertTriangle,
-  X, Check, ArrowRight, Loader2
+  TrendingDown, ChevronRight, LogOut, StopCircle,
+  Layers, CheckCircle2, AlertTriangle,
+  X, ArrowRight, Loader2, Calendar
 } from "lucide-react";
 import BottomNav from "../components/BottomNav";
 import {
@@ -18,92 +18,232 @@ import {
   LedgerItem
 } from "../lib/ledger-storage";
 
-// National Food Agency (Bapanas) benchmark for dried corn kernels (Jagung Pipil Kering kadar air 15%)
-const DEMO_MARKET_PRICE = 5500;
-const MARKET_CROP = "Dried Corn (Jagung Pipil)";
+export type CommodityType = "corn" | "chili" | "rice";
 
-function HppConfidenceChart({ values, marketPrice }: { values: number[]; marketPrice: number }) {
-  // Realistic corn production cost / HPP demo data (Rp 3,800 - 4,800/kg)
-  const demoVals = [3800, 4100, 4350, 4700, 3950, 4200, 4600, 4300];
-  const displayVals = values.length > 0 ? values : demoVals;
-  const max = Math.max(...displayVals, marketPrice) * 1.25;
-  const currentVal = displayVals[displayVals.length - 1];
-  const margin = marketPrice - currentVal;
-  const isProfitable = margin >= 0;
+interface CommodityMonthData {
+  month: string;
+  monthShort: string;
+  marketPrice: number;
+  hpp: number;
+}
+
+interface CommodityInfo {
+  id: CommodityType;
+  name: string;
+  shortName: string;
+  icon: string;
+  unit: string;
+  marketPrice: number;
+  benchmarkAgency: string;
+  defaultHpp: number;
+  history3Months: CommodityMonthData[];
+  guideText: string;
+}
+
+const COMMODITIES: Record<CommodityType, CommodityInfo> = {
+  corn: {
+    id: "corn",
+    name: "Dried Corn (Jagung Pipil)",
+    shortName: "Corn",
+    icon: "🌽",
+    unit: "kg dry kernel",
+    marketPrice: 5500,
+    benchmarkAgency: "Bapanas Benchmark",
+    defaultHpp: 4200,
+    history3Months: [
+      { month: "July 2026", monthShort: "Jul", marketPrice: 5200, hpp: 4100 },
+      { month: "August 2026", monthShort: "Aug", marketPrice: 5350, hpp: 4250 },
+      { month: "September 2026", monthShort: "Sep", marketPrice: 5500, hpp: 4200 },
+    ],
+    guideText: "When production cost stays below Rp 5,500/kg, you secure a healthy harvest profit.",
+  },
+  chili: {
+    id: "chili",
+    name: "Red Chili (Cabai Merah)",
+    shortName: "Chili",
+    icon: "🌶️",
+    unit: "kg fresh chili",
+    marketPrice: 32000,
+    benchmarkAgency: "PIHPS Benchmark",
+    defaultHpp: 23200,
+    history3Months: [
+      { month: "July 2026", monthShort: "Jul", marketPrice: 28000, hpp: 22000 },
+      { month: "August 2026", monthShort: "Aug", marketPrice: 35000, hpp: 24500 },
+      { month: "September 2026", monthShort: "Sep", marketPrice: 32000, hpp: 23200 },
+    ],
+    guideText: "Chili prices fluctuate rapidly. Keeping HPP under Rp 28,000 shields against sudden dips.",
+  },
+  rice: {
+    id: "rice",
+    name: "Milled Grain (Padi / Gabah)",
+    shortName: "Rice",
+    icon: "🌾",
+    unit: "kg dry grain (GKG)",
+    marketPrice: 7200,
+    benchmarkAgency: "HPP Bapanas GKG",
+    defaultHpp: 5250,
+    history3Months: [
+      { month: "July 2026", monthShort: "Jul", marketPrice: 6800, hpp: 5100 },
+      { month: "August 2026", monthShort: "Aug", marketPrice: 7000, hpp: 5300 },
+      { month: "September 2026", monthShort: "Sep", marketPrice: 7200, hpp: 5250 },
+    ],
+    guideText: "Government GKG benchmark guarantees Rp 7,200/kg. Track fertilizer & labor to secure returns.",
+  },
+};
+
+// 3-Month Historical Price & Cost Trend Chart
+function ThreeMonthPriceChart({
+  commodity,
+  currentHpp,
+}: {
+  commodity: CommodityInfo;
+  currentHpp: number;
+}) {
+  // Replace current month HPP with user's actual HPP if calculated
+  const chartData = commodity.history3Months.map((m, idx) => {
+    if (idx === 2 && currentHpp > 0) {
+      return { ...m, hpp: currentHpp };
+    }
+    return m;
+  });
+
+  const allPrices = chartData.flatMap((d) => [d.marketPrice, d.hpp]);
+  const maxVal = Math.max(...allPrices) * 1.18;
+
+  const currentMonthData = chartData[2];
+  const currentMargin = currentMonthData.marketPrice - currentMonthData.hpp;
+  const isProfitable = currentMargin >= 0;
 
   return (
-    <div className="space-y-3">
-      {/* Top Metric Callout */}
-      <div className="flex items-center justify-between bg-slate-50 rounded-2xl p-3 border border-slate-100">
+    <div className="space-y-3.5">
+      {/* Current Month Callout Badge */}
+      <div className="flex items-center justify-between bg-slate-50/90 rounded-2xl p-3 border border-slate-100">
         <div>
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Latest Corn Cost (HPP)</span>
-          <p className="text-base font-black text-slate-900">
-            Rp {currentVal.toLocaleString("en-US")}{" "}
-            <span className="text-xs font-semibold text-slate-500">/ kg</span>
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+            {currentMonthData.month} Status
+          </span>
+          <p className="text-sm font-black text-slate-900 mt-0.5">
+            Rp {currentMonthData.marketPrice.toLocaleString("en-US")}{" "}
+            <span className="text-[11px] font-medium text-slate-400">/ {commodity.unit}</span>
           </p>
         </div>
         <div className="text-right">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Estimated Margin</span>
-          <p className={`text-sm font-black ${isProfitable ? "text-emerald-600" : "text-red-500"}`}>
-            {isProfitable ? `+Rp ${margin.toLocaleString("en-US")}` : `-Rp ${Math.abs(margin).toLocaleString("en-US")}`}
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+            Net Profit Margin
+          </span>
+          <p
+            className={`text-sm font-black mt-0.5 ${
+              isProfitable ? "text-emerald-600" : "text-rose-500"
+            }`}
+          >
+            {isProfitable ? `+Rp ${currentMargin.toLocaleString("en-US")}` : `-Rp ${Math.abs(currentMargin).toLocaleString("en-US")}`}
           </p>
         </div>
       </div>
 
-      {/* Chart Canvas */}
-      <div className="relative pt-6 pb-2">
-        {/* Market Benchmark Horizontal Guideline */}
-        <div
-          className="absolute left-0 right-0 border-t-2 border-dashed border-amber-500/80 z-10 flex items-center justify-between"
-          style={{ bottom: `${Math.min(95, Math.max(15, (marketPrice / max) * 100))}%` }}
-        >
-          <span className="text-[9px] font-black text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded shadow-xs -mt-3.5">
-            Corn Benchmark: Rp {marketPrice.toLocaleString("en-US")}/kg
-          </span>
-          <span className="text-[8px] font-bold text-slate-400 uppercase -mt-3.5 pr-1">Target Line</span>
-        </div>
+      {/* 3 Months Paired Bar Chart */}
+      <div className="relative pt-2 pb-1">
+        <div className="grid grid-cols-3 gap-3">
+          {chartData.map((d, i) => {
+            const isCurrent = i === 2;
+            const marketHeight = Math.max(16, (d.marketPrice / maxVal) * 100);
+            const hppHeight = Math.max(16, (d.hpp / maxVal) * 100);
+            const margin = d.marketPrice - d.hpp;
+            const prof = margin >= 0;
 
-        {/* Bar Columns */}
-        <div className="flex items-end space-x-2 h-28 px-1">
-          {displayVals.slice(-8).map((v, i) => {
-            const heightPct = Math.max(14, Math.min(100, (v / max) * 100));
-            const profitable = v <= marketPrice;
-            const cycleNumber = i + 1;
             return (
-              <div key={i} className="flex-1 flex flex-col items-center group relative cursor-pointer">
-                {/* Hover / tap tooltip */}
-                <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[9px] font-bold py-0.5 px-1.5 rounded whitespace-nowrap z-20 pointer-events-none shadow-md">
-                  Rp {v.toLocaleString()}
+              <div
+                key={d.monthShort}
+                className={`flex flex-col items-center p-2 rounded-2xl border transition-all ${
+                  isCurrent
+                    ? "bg-emerald-50/50 border-emerald-300/80 shadow-xs"
+                    : "bg-slate-50/60 border-slate-100"
+                }`}
+              >
+                {/* Month Name */}
+                <div className="flex items-center space-x-1 mb-2">
+                  <Calendar size={11} className={isCurrent ? "text-emerald-700" : "text-slate-400"} />
+                  <span
+                    className={`text-[11px] font-extrabold ${
+                      isCurrent ? "text-emerald-900" : "text-slate-600"
+                    }`}
+                  >
+                    {d.monthShort}
+                  </span>
+                  {isCurrent && (
+                    <span className="bg-emerald-600 text-white text-[8px] font-black px-1 rounded uppercase">
+                      Now
+                    </span>
+                  )}
                 </div>
-                <div
-                  className={`w-full rounded-t-md transition-all duration-700 relative overflow-hidden ${
-                    profitable
-                      ? "bg-gradient-to-t from-emerald-600 to-emerald-400 hover:from-emerald-500 hover:to-emerald-300"
-                      : "bg-gradient-to-t from-red-500 to-rose-400 hover:from-red-400 hover:to-rose-300"
-                  }`}
-                  style={{ height: `${heightPct}%` }}
-                />
-                <span className="text-[9px] font-bold text-slate-400 mt-1.5">#{cycleNumber}</span>
+
+                {/* Bars Area */}
+                <div className="w-full flex items-end justify-center space-x-2 h-28 px-1 pb-1">
+                  {/* Market Price Bar */}
+                  <div className="flex-1 flex flex-col items-center group relative cursor-pointer h-full justify-end">
+                    <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[9px] font-bold py-0.5 px-1 rounded whitespace-nowrap z-20 pointer-events-none shadow-md">
+                      Market: Rp {d.marketPrice.toLocaleString()}
+                    </div>
+                    <div
+                      className="w-full rounded-t-md bg-gradient-to-t from-amber-500 to-amber-400 transition-all duration-500"
+                      style={{ height: `${marketHeight}%` }}
+                    />
+                    <span className="text-[8px] font-bold text-amber-700 mt-1">Mkt</span>
+                  </div>
+
+                  {/* Farmer HPP Bar */}
+                  <div className="flex-1 flex flex-col items-center group relative cursor-pointer h-full justify-end">
+                    <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[9px] font-bold py-0.5 px-1 rounded whitespace-nowrap z-20 pointer-events-none shadow-md">
+                      Cost: Rp {d.hpp.toLocaleString()}
+                    </div>
+                    <div
+                      className={`w-full rounded-t-md transition-all duration-500 ${
+                        prof
+                          ? "bg-gradient-to-t from-emerald-600 to-emerald-400"
+                          : "bg-gradient-to-t from-rose-500 to-rose-400"
+                      }`}
+                      style={{ height: `${hppHeight}%` }}
+                    />
+                    <span className={`text-[8px] font-bold mt-1 ${prof ? "text-emerald-700" : "text-rose-600"}`}>
+                      Cost
+                    </span>
+                  </div>
+                </div>
+
+                {/* Margin Value Tag */}
+                <div className="w-full text-center mt-1 pt-1 border-t border-slate-200/60">
+                  <span
+                    className={`text-[9px] font-black ${
+                      prof ? "text-emerald-700" : "text-rose-600"
+                    }`}
+                  >
+                    {prof ? `+Rp ${margin.toLocaleString()}` : `-Rp ${Math.abs(margin).toLocaleString()}`}
+                  </span>
+                </div>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* Legend & Explanation */}
+      {/* Legend & Guide */}
       <div className="bg-slate-50/80 rounded-xl p-2.5 border border-slate-100 flex items-center justify-between text-[10px]">
         <div className="flex items-center space-x-1.5">
-          <span className="w-2.5 h-2.5 bg-emerald-500 rounded-sm" />
-          <span className="font-semibold text-slate-700">Profitable (HPP &lt; Rp 5,500)</span>
+          <span className="w-2.5 h-2.5 bg-amber-400 rounded-xs" />
+          <span className="font-semibold text-slate-700">Market Price</span>
         </div>
         <div className="flex items-center space-x-1.5">
-          <span className="w-2.5 h-2.5 bg-red-400 rounded-sm" />
-          <span className="font-semibold text-slate-700">Cost Deficit</span>
+          <span className="w-2.5 h-2.5 bg-emerald-500 rounded-xs" />
+          <span className="font-semibold text-slate-700">Farm Cost (HPP)</span>
+        </div>
+        <div className="flex items-center space-x-1.5">
+          <span className="w-2.5 h-2.5 bg-rose-400 rounded-xs" />
+          <span className="font-semibold text-slate-700">Deficit</span>
         </div>
       </div>
 
       <p className="text-[10px] text-slate-400 leading-relaxed font-medium">
-        🌽 <strong className="text-slate-600">Corn Farmer Guide:</strong> When production cost stays below the amber guideline (Rp 5,500/kg), you secure a healthy harvest profit. Upload corn receipts regularly to track expenses.
+        {commodity.icon} <strong className="text-slate-600">3-Month Farmer Insight:</strong> {commodity.guideText}
       </p>
     </div>
   );
@@ -123,6 +263,7 @@ export default function HomePage() {
   const router = useRouter();
   const { user } = useProtected();
   const { signOut } = useAuth();
+  const [selectedCommodity, setSelectedCommodity] = useState<CommodityType>("corn");
   const [ledger, setLedger] = useState<LedgerItem[]>([]);
   const [walletBalance, setWalletBalance] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -140,6 +281,8 @@ export default function HomePage() {
   const [batchTotalCost, setBatchTotalCost] = useState(0);
   const [batchAudioUrl, setBatchAudioUrl] = useState<string | null>(null);
   const [batchTranscript, setBatchTranscript] = useState<string | null>(null);
+
+  const activeCommodity = COMMODITIES[selectedCommodity];
 
   const fetchLedger = useCallback(async () => {
     const receipts = await fetchAllReceipts(user?.id);
@@ -178,95 +321,116 @@ export default function HomePage() {
   // Single receipt upload handler
   const handleFileSelect = async (file: File) => {
     if (!file) return;
-    primeAudioContext();
     setUploading(true);
-
-    const formData = new FormData();
-    formData.append("file", file);
+    primeAudioContext();
 
     try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("commodity", selectedCommodity);
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const res = await fetch(`${apiUrl}/audit`, { method: "POST", body: formData });
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const res = await fetch(`${apiUrl}/audit`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
+
       const data = await res.json();
-
-      sessionStorage.setItem("auditResult", JSON.stringify(data));
-
       const rec = data.transaction_record || data.evaluation || {};
       const fin = data.financials || {};
-      const voice = data.voice_brief || {};
-      const audioUrl = voice.audio_url ? `${apiUrl}${voice.audio_url}` : null;
+      const isOriginal = rec.is_original_receipt !== false;
 
-      // Persist to Dual-Storage (localStorage + Supabase)
-      const newEntry: LedgerItem = {
+      const newLedgerItem: LedgerItem = {
         id: crypto.randomUUID(),
         user_id: user?.id || null,
-        merchant_name: rec.merchant_name || "Corn Farm Supplier",
-        primary_category: rec.primary_receipt_category || rec.primary_category || "Corn Input",
+        merchant_name: rec.merchant_name || "Farm Supplier",
+        primary_category: rec.primary_receipt_category || `${activeCommodity.shortName} Input`,
         quality_score: rec.image_quality_score ?? 8,
-        reward_earned: data.reward ?? rec.reward_earned_idr ?? 0,
-        total_production_cost: fin.total_production_cost ?? rec.total_production_cost_idr ?? 0,
-        hpp_per_kg: fin.hpp_per_kg ?? rec.hpp_per_kg_idr ?? 0,
-        fraud_detected: rec.is_original_receipt !== undefined ? !rec.is_original_receipt : false,
+        reward_earned: data.reward || 0,
+        total_production_cost: fin.total_production_cost || rec.total_amount_idr || 0,
+        hpp_per_kg: fin.hpp_per_kg || activeCommodity.defaultHpp,
+        fraud_detected: !isOriginal,
         created_at: new Date().toISOString(),
-        voice_transcript: voice.transcript || null,
-        audio_url: audioUrl,
+        voice_transcript: data.voice_brief?.transcript || null,
+        audio_url: data.voice_brief?.audio_url ? `${apiUrl}${data.voice_brief.audio_url}` : null,
       };
 
-      await saveLedgerReceipt(newEntry);
-      sessionStorage.setItem("lastLedgerId", newEntry.id);
+      await saveLedgerReceipt(newLedgerItem);
+      await fetchLedger();
 
-      router.push("/verdict");
+      if (fin.hpp_per_kg) {
+        setLastHpp(fin.hpp_per_kg);
+        localStorage.setItem("lastHpp", String(fin.hpp_per_kg));
+      }
+
+      if (data.voice_brief?.audio_url) {
+        const fullAudioUrl = `${apiUrl}${data.voice_brief.audio_url}`;
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current = null;
+        }
+        const audio = new Audio(fullAudioUrl);
+        audio.play().catch(() => {});
+        audio.onended = () => { audioRef.current = null; setIsPlayingAudio(false); };
+        audioRef.current = audio;
+        setIsPlayingAudio(true);
+      }
+
+      router.push("/receipts");
     } catch (err: any) {
-      alert("Upload failed: " + (err?.message || "Make sure the API server is running."));
+      alert(`Could not process receipt: ${err.message || "Network error"}`);
+    } finally {
       setUploading(false);
     }
   };
 
-  // Bulk / Batch Upload Handler
+  // Bulk / Multiple files upload handler
   const handleBatchSelect = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+    const fileList = Array.from(files);
     primeAudioContext();
 
-    const fileList = Array.from(files);
-    const initialItems: BatchItemProgress[] = fileList.map((f) => ({
-      filename: f.name,
-      status: "pending",
-    }));
-
-    setBatchItems(initialItems);
+    setBatchItems(
+      fileList.map((f) => ({
+        filename: f.name,
+        status: "pending",
+      }))
+    );
     setBatchCurrentIndex(0);
-    setBatchProcessing(true);
-    setBatchCompleted(false);
     setBatchTotalReward(0);
     setBatchTotalCost(0);
+    setBatchCompleted(false);
+    setBatchProcessing(true);
     setBatchAudioUrl(null);
     setBatchTranscript(null);
     setBatchModalOpen(true);
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    const batchFormData = new FormData();
-    fileList.forEach((f) => batchFormData.append("files", f));
 
     try {
-      // Try batch endpoint on backend
-      const batchRes = await fetch(`${apiUrl}/api/v1/batch-audit`, {
+      const batchFormData = new FormData();
+      fileList.forEach((f) => batchFormData.append("files", f));
+      batchFormData.append("commodity", selectedCommodity);
+
+      const batchRes = await fetch(`${apiUrl}/audit-batch`, {
         method: "POST",
         body: batchFormData,
       });
 
       if (batchRes.ok) {
         const batchData = await batchRes.json();
-        const results = batchData.results || [];
         const savedEntries: LedgerItem[] = [];
-
         let rewardAccumulator = 0;
         let costAccumulator = 0;
 
-        const updatedProgress: BatchItemProgress[] = results.map((r: any, idx: number) => {
+        const updatedProgress: BatchItemProgress[] = batchData.receipts.map((r: any, idx: number) => {
           const evalData = r.evaluation || {};
           const finData = r.financials || {};
-          const isOk = r.status === "success" && evalData.is_original_receipt !== false;
+          const isOk = r.status === "verified";
 
           const reward = r.reward || 0;
           const cost = finData.total_production_cost || evalData.total_amount_idr || 0;
@@ -278,12 +442,12 @@ export default function HomePage() {
           const entry: LedgerItem = {
             id: crypto.randomUUID(),
             user_id: user?.id || null,
-            merchant_name: evalData.merchant_name || `Corn Supplier #${idx + 1}`,
-            primary_category: evalData.primary_receipt_category || "Corn Input",
+            merchant_name: evalData.merchant_name || `Supplier #${idx + 1}`,
+            primary_category: evalData.primary_receipt_category || `${activeCommodity.shortName} Input`,
             quality_score: evalData.image_quality_score ?? 8,
             reward_earned: reward,
             total_production_cost: cost,
-            hpp_per_kg: finData.hpp_per_kg || 0,
+            hpp_per_kg: finData.hpp_per_kg || activeCommodity.defaultHpp,
             fraud_detected: !isOk,
             created_at: new Date().toISOString(),
             voice_transcript: batchData.voice_brief?.transcript || null,
@@ -295,7 +459,7 @@ export default function HomePage() {
             filename: r.filename,
             status: isOk ? "done" : "error",
             merchant: evalData.merchant_name || "Farm Supplier",
-            category: evalData.primary_receipt_category || "Corn Input",
+            category: evalData.primary_receipt_category || `${activeCommodity.shortName} Input`,
             amount: cost,
             reward: reward,
             errorMsg: !isOk ? (evalData.fraud_flags?.[0] || "Invalid receipt") : undefined,
@@ -317,10 +481,9 @@ export default function HomePage() {
         setBatchCompleted(true);
         setBatchProcessing(false);
       } else {
-        throw new Error(`Batch API error ${batchRes.status}`);
+        throw new Error(`Batch API status ${batchRes.status}`);
       }
     } catch (batchErr) {
-      // Fallback: Sequential single uploads
       console.warn("Batch endpoint fallback to sequential:", batchErr);
       const newSavedEntries: LedgerItem[] = [];
       let rewardAccumulator = 0;
@@ -335,6 +498,7 @@ export default function HomePage() {
         try {
           const singleForm = new FormData();
           singleForm.append("file", fileList[i]);
+          singleForm.append("commodity", selectedCommodity);
           const singleRes = await fetch(`${apiUrl}/audit`, {
             method: "POST",
             body: singleForm,
@@ -354,12 +518,12 @@ export default function HomePage() {
           const entry: LedgerItem = {
             id: crypto.randomUUID(),
             user_id: user?.id || null,
-            merchant_name: rec.merchant_name || "Corn Supplier",
-            primary_category: rec.primary_receipt_category || "Corn Input",
+            merchant_name: rec.merchant_name || "Farm Supplier",
+            primary_category: rec.primary_receipt_category || `${activeCommodity.shortName} Input`,
             quality_score: rec.image_quality_score ?? 8,
             reward_earned: reward,
             total_production_cost: cost,
-            hpp_per_kg: fin.hpp_per_kg || 0,
+            hpp_per_kg: fin.hpp_per_kg || activeCommodity.defaultHpp,
             fraud_detected: !isOk,
             created_at: new Date().toISOString(),
           };
@@ -400,7 +564,7 @@ export default function HomePage() {
   const handleListenSummary = () => {
     const latestAudio = ledger.find((r) => r.audio_url)?.audio_url;
     if (!latestAudio) {
-      alert("No audio brief available yet. Upload a corn receipt first.");
+      alert("No audio brief available yet. Upload a receipt first.");
       return;
     }
     if (audioRef.current) {
@@ -423,31 +587,34 @@ export default function HomePage() {
     router.push("/");
   };
 
-  const hpp = lastHpp ?? 4200;
-  const isAboveMarket = DEMO_MARKET_PRICE > hpp;
-  const hppValues = ledger.filter((r) => r.hpp_per_kg > 0).map((r) => r.hpp_per_kg).reverse();
+  const hpp = lastHpp ?? activeCommodity.defaultHpp;
+  const isAboveMarket = activeCommodity.marketPrice > hpp;
   const latestTranscript = ledger.find((r) => r.voice_transcript)?.voice_transcript;
   const latestAudioAvailable = ledger.some((r) => r.audio_url);
 
   return (
-    <div className="min-h-screen bg-slate-50 max-w-md mx-auto pb-48 font-sans relative">
-      {/* Header */}
-      <header className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-800 px-5 pt-12 pb-5 relative overflow-hidden">
+    <div className="min-h-dvh bg-slate-50 max-w-md mx-auto pb-[calc(11.5rem+env(safe-area-inset-bottom,0px))] font-sans relative">
+      {/* Header - Styled with safe area awareness for iPhone Dynamic Island / Notch */}
+      <header className="bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-800 px-4 sm:px-5 pt-[max(2.5rem,calc(env(safe-area-inset-top)+0.75rem))] pb-5 relative overflow-hidden">
         <div className="absolute -top-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-2xl pointer-events-none" />
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center text-xl">
-              🌽
+            <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center text-xl shrink-0">
+              {activeCommodity.icon}
             </div>
-            <div>
-              <h1 className="text-white font-extrabold text-base leading-none">TaniJaga</h1>
-              <p className="text-emerald-300/70 text-[10px] font-medium">Corn AI Financial Engine</p>
+            <div className="min-w-0">
+              <h1 className="text-white font-extrabold text-base leading-none truncate">TaniJaga</h1>
+              <p className="text-emerald-300/70 text-[10px] font-medium mt-0.5 truncate">
+                AI Farm Financial Engine
+              </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="text-right mr-1">
+          <div className="flex items-center space-x-2 shrink-0">
+            <div className="text-right mr-1 hidden sm:block">
               <p className="text-emerald-200/60 text-[9px] font-medium leading-none">Signed in as</p>
-              <p className="text-emerald-100 text-[11px] font-bold truncate max-w-[120px]">{user?.email || "Corn Farmer"}</p>
+              <p className="text-emerald-100 text-[11px] font-bold truncate max-w-[120px]">
+                {user?.email || "Farmer"}
+              </p>
             </div>
             <button
               onClick={handleSignOut}
@@ -459,11 +626,15 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Wallet balance */}
+        {/* Wallet Balance Card */}
         <div className="mt-4 bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15 flex items-center justify-between">
           <div>
-            <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wider">Total Incentive Earned</p>
-            <p className="text-white font-black text-xl mt-0.5">Rp {walletBalance.toLocaleString("en-US")}</p>
+            <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wider">
+              Total Incentive Earned
+            </p>
+            <p className="text-white font-black text-xl mt-0.5">
+              Rp {walletBalance.toLocaleString("en-US")}
+            </p>
           </div>
           <div className="bg-gradient-to-br from-emerald-500 to-teal-500 p-2.5 rounded-xl shadow-lg">
             <Wallet size={20} className="text-white" />
@@ -471,31 +642,139 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="px-4 pt-4 space-y-4">
-        {/* Break-even HPP Card */}
-        <div className="bg-gradient-to-br from-emerald-700 to-teal-700 rounded-3xl p-5 text-white shadow-lg shadow-emerald-700/20 relative overflow-hidden">
+      <main className="px-4 pt-3.5 space-y-3.5">
+        {/* Commodity Selector Switcher */}
+        <div className="bg-white rounded-2xl p-1.5 border border-slate-200/80 shadow-xs flex items-center space-x-1">
+          {(["corn", "chili", "rice"] as CommodityType[]).map((cid) => {
+            const item = COMMODITIES[cid];
+            const active = selectedCommodity === cid;
+            return (
+              <button
+                key={cid}
+                onClick={() => setSelectedCommodity(cid)}
+                className={`flex-1 flex items-center justify-center space-x-1.5 py-2 px-2 rounded-xl text-xs font-extrabold transition-all ${
+                  active
+                    ? "bg-emerald-800 text-white shadow-sm shadow-emerald-900/20"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                }`}
+              >
+                <span className="text-sm">{item.icon}</span>
+                <span className="truncate">{item.shortName}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Break-even HPP Card for selected commodity */}
+        <div className="bg-gradient-to-br from-emerald-700 to-teal-700 rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-emerald-700/20 relative overflow-hidden">
           <div className="absolute -top-6 -right-6 w-32 h-32 bg-white/5 rounded-full blur-xl" />
           <div className="flex items-center justify-between">
-            <p className="text-emerald-100/80 text-xs font-bold uppercase tracking-widest">Corn Break-even HPP</p>
-            <span className="text-[10px] font-extrabold bg-white/20 px-2 py-0.5 rounded-full">Dried Corn</span>
+            <p className="text-emerald-100/80 text-xs font-bold uppercase tracking-widest">
+              {activeCommodity.shortName} Break-even HPP
+            </p>
+            <span className="text-[10px] font-extrabold bg-white/20 px-2 py-0.5 rounded-full">
+              {activeCommodity.icon} {activeCommodity.shortName}
+            </span>
           </div>
-          <p className="text-4xl font-black mt-1.5 mb-0.5">Rp {hpp.toLocaleString("en-US")}</p>
-          <p className="text-emerald-200/70 text-[11px] font-semibold">/ kg dry kernel harvest</p>
-          <div className="mt-4 bg-amber-400/20 border border-amber-300/30 rounded-2xl px-4 py-3">
+          <p className="text-3xl sm:text-4xl font-black mt-1.5 mb-0.5">
+            Rp {hpp.toLocaleString("en-US")}
+          </p>
+          <p className="text-emerald-200/70 text-[11px] font-semibold">
+            / {activeCommodity.unit} harvest
+          </p>
+          <div className="mt-3.5 bg-amber-400/20 border border-amber-300/30 rounded-2xl px-3.5 py-2.5">
             <p className="text-amber-100 text-xs font-bold leading-snug">
-              ⚠️ Selling above Rp {hpp.toLocaleString()} guarantees a profit. Government benchmark is Rp 5,500/kg.
+              ⚠️ Selling above Rp {hpp.toLocaleString()} guarantees a profit. Market benchmark is Rp {activeCommodity.marketPrice.toLocaleString("en-US")}/{activeCommodity.unit.split(" ")[0]}.
             </p>
           </div>
         </div>
 
-        {/* Listen Summary by ElevenLabs */}
+        {/* 3-Month Price & HPP Chart Card */}
+        <div className="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="font-extrabold text-slate-800 text-sm">
+                3-Month Price &amp; Cost Trend
+              </h3>
+              <p className="text-[10px] text-slate-500 font-medium">
+                {activeCommodity.name} benchmark vs. farm HPP
+              </p>
+            </div>
+            <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+              Last 3 Mos
+            </span>
+          </div>
+          <ThreeMonthPriceChart
+            commodity={activeCommodity}
+            currentHpp={hpp}
+          />
+        </div>
+
+        {/* Market Price Today Widget */}
+        <div className="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-extrabold text-slate-800 text-sm truncate mr-2">
+              Market Price Today ({activeCommodity.shortName})
+            </h3>
+            <span className="text-[10px] text-slate-400 font-medium shrink-0">
+              {activeCommodity.benchmarkAgency}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-xl shrink-0">
+                {activeCommodity.icon}
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500 font-semibold">Harvest Margin</p>
+                <span
+                  className={
+                    "text-xs font-extrabold px-2.5 py-0.5 rounded-full " +
+                    (isAboveMarket ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-700")
+                  }
+                >
+                  {isAboveMarket ? "▲ PROFITABLE" : "▼ BELOW HPP"}
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xl sm:text-2xl font-black text-slate-900">
+                Rp {activeCommodity.marketPrice.toLocaleString("en-US")}
+              </p>
+              <p className="text-[10px] text-slate-500 font-medium">
+                / {activeCommodity.unit}
+              </p>
+              <div className="flex items-center justify-end space-x-1 mt-0.5">
+                {isAboveMarket ? (
+                  <TrendingUp size={12} className="text-emerald-600" />
+                ) : (
+                  <TrendingDown size={12} className="text-red-500" />
+                )}
+                <span
+                  className={
+                    "text-[10px] font-bold " +
+                    (isAboveMarket ? "text-emerald-600" : "text-red-500")
+                  }
+                >
+                  {isAboveMarket
+                    ? `+Rp ${(activeCommodity.marketPrice - hpp).toLocaleString()} profit margin`
+                    : "Below your HPP"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Listen Summary by ElevenLabs AI */}
         <div className="bg-purple-50/90 rounded-3xl p-4 border border-purple-200/80 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-base">🎙️</span>
               <div>
                 <h3 className="text-purple-950 font-extrabold text-xs">AI Voice Brief</h3>
-                <p className="text-purple-600/80 text-[10px] font-semibold">Spoken English summary by ElevenLabs AI</p>
+                <p className="text-purple-600/80 text-[10px] font-semibold">
+                  Spoken farm brief by ElevenLabs AI
+                </p>
               </div>
             </div>
             <span className="text-[9px] bg-purple-200/80 text-purple-800 font-extrabold px-2 py-0.5 rounded-full">
@@ -520,126 +799,146 @@ export default function HomePage() {
             }`}
           >
             <div className="w-7 h-7 rounded-xl flex items-center justify-center bg-white/20">
-              {isPlayingAudio ? <StopCircle size={15} className="text-white" /> : <Volume2 size={15} className="text-white" />}
+              {isPlayingAudio ? (
+                <StopCircle size={15} className="text-white" />
+              ) : (
+                <Volume2 size={15} className="text-white" />
+              )}
             </div>
             <span className="font-extrabold text-xs tracking-wide">
-              {isPlayingAudio ? "Stop Audio Brief" : latestAudioAvailable ? "Listen to Corn Audio Brief" : "Listen to Sample Brief"}
+              {isPlayingAudio
+                ? "Stop Audio Brief"
+                : latestAudioAvailable
+                ? "Listen to Voice Brief"
+                : "Listen to Sample Brief"}
             </span>
           </button>
         </div>
 
-        {/* Cost of Production vs. Market Benchmark Chart */}
-        <div className="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h3 className="font-extrabold text-slate-800 text-sm">Corn HPP vs. Market Price</h3>
-              <p className="text-[10px] text-slate-500 font-medium">
-                Production cost history vs. national corn price benchmark
-              </p>
-            </div>
-            <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">Rp / kg</span>
-          </div>
-          <HppConfidenceChart values={hppValues} marketPrice={DEMO_MARKET_PRICE} />
-        </div>
-
-        {/* Market Price Today */}
-        <div className="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-extrabold text-slate-800 text-sm">Market Price Today ({MARKET_CROP})</h3>
-            <span className="text-[10px] text-slate-400 font-medium">Bapanas Benchmark</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-xl">🌽</div>
-              <div>
-                <p className="text-[10px] text-slate-500 font-semibold">Harvest Margin</p>
-                <span className={"text-xs font-extrabold px-2.5 py-0.5 rounded-full " + (isAboveMarket ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-700")}>
-                  {isAboveMarket ? "▲ PROFITABLE" : "▼ BELOW HPP"}
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-black text-slate-900">Rp {DEMO_MARKET_PRICE.toLocaleString("en-US")}</p>
-              <p className="text-[10px] text-slate-500 font-medium">/ kg dry kernel</p>
-              <div className="flex items-center justify-end space-x-1 mt-0.5">
-                {isAboveMarket ? <TrendingUp size={12} className="text-emerald-600" /> : <TrendingDown size={12} className="text-red-500" />}
-                <span className={"text-[10px] font-bold " + (isAboveMarket ? "text-emerald-600" : "text-red-500")}>
-                  {isAboveMarket ? `+Rp ${(DEMO_MARKET_PRICE - hpp).toLocaleString()} profit margin` : "Below your HPP"}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Upload Stats Row */}
+        {/* Ledger Link Card */}
         <div className="bg-white rounded-3xl px-4 py-3.5 shadow-xs border border-slate-100 flex items-center justify-between">
           <div>
-            <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Verified Corn Records</p>
+            <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
+              Verified Farm Receipts
+            </p>
             <div className="flex items-center space-x-2 mt-0.5">
-              <span className="font-black text-emerald-700 text-base">Rp {walletBalance.toLocaleString("en-US")}</span>
+              <span className="font-black text-emerald-700 text-base">
+                Rp {walletBalance.toLocaleString("en-US")}
+              </span>
               <span className="text-slate-300">|</span>
-              <span className="text-slate-600 text-xs font-semibold">{ledger.length} receipts</span>
+              <span className="text-slate-600 text-xs font-semibold">
+                {ledger.length} receipts
+              </span>
             </div>
           </div>
-          <button onClick={() => router.push("/receipts")} className="flex items-center space-x-1 text-emerald-700 text-xs font-bold hover:text-emerald-800 transition-colors">
+          <button
+            onClick={() => router.push("/receipts")}
+            className="flex items-center space-x-1 text-emerald-700 text-xs font-bold hover:text-emerald-800 transition-colors"
+          >
             <span>View ledger</span>
             <ChevronRight size={14} />
           </button>
         </div>
       </main>
 
-      {/* Floating Sticky Upload Actions */}
-      <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40 space-y-2">
-        {/* Primary Instant Photo Button */}
-        <label className={"w-full flex items-center justify-center space-x-2.5 py-3.5 rounded-2xl font-extrabold text-sm shadow-xl cursor-pointer active:scale-[0.98] transition-all " + (uploading ? "bg-slate-400 cursor-not-allowed" : "bg-slate-900 hover:bg-slate-800 shadow-slate-900/30")}>
-          {uploading ? (
-            <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /><span className="text-white">Auditing Receipt...</span></>
-          ) : (
-            <><Camera size={18} className="text-white" /><span className="text-white">📷 SNAP CORN RECEIPT</span></>
+      {/* Floating Sticky Upload Actions Dock - Elevated & safe-area padded for iPhone */}
+      <div className="fixed bottom-[calc(4.25rem+env(safe-area-inset-bottom,0px)+0.5rem)] left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40 pointer-events-none">
+        <div className="pointer-events-auto space-y-2">
+          {/* Primary Instant Photo Button (Generalised title) */}
+          <label
+            className={
+              "w-full flex items-center justify-center space-x-2.5 py-3.5 rounded-2xl font-extrabold text-sm shadow-xl cursor-pointer active:scale-[0.98] transition-all " +
+              (uploading
+                ? "bg-slate-400 cursor-not-allowed text-white"
+                : "bg-slate-900 hover:bg-slate-800 shadow-slate-900/30 text-white")
+            }
+          >
+            {uploading ? (
+              <>
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Auditing Receipt...</span>
+              </>
+            ) : (
+              <>
+                <Camera size={18} />
+                <span>📷 SNAP RECEIPT</span>
+              </>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFileSelect(f);
+                e.target.value = "";
+              }}
+            />
+          </label>
+
+          {/* Secondary Dual Action Row: Gallery + Bulk Upload */}
+          {!uploading && (
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex items-center justify-center space-x-1.5 py-2.5 rounded-xl text-slate-700 text-xs font-bold cursor-pointer hover:text-emerald-700 transition-colors bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-sm">
+                <ImageIcon size={14} className="text-slate-500" />
+                <span>Gallery Photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFileSelect(f);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+
+              <label className="flex items-center justify-center space-x-1.5 py-2.5 rounded-xl text-emerald-900 text-xs font-bold cursor-pointer hover:text-emerald-950 transition-colors bg-emerald-50/95 backdrop-blur-md border border-emerald-300 shadow-sm">
+                <Layers size={14} className="text-emerald-700" />
+                <span>Bulk Upload Batch</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    handleBatchSelect(e.target.files);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
           )}
-          <input type="file" accept="image/*" capture="environment" className="hidden" disabled={uploading}
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); e.target.value = ""; }} />
-        </label>
-
-        {/* Secondary Dual Action Row: Gallery + Bulk Upload */}
-        {!uploading && (
-          <div className="grid grid-cols-2 gap-2">
-            <label className="flex items-center justify-center space-x-1.5 py-2.5 rounded-xl text-slate-600 text-xs font-bold cursor-pointer hover:text-emerald-700 transition-colors bg-white/95 backdrop-blur-xs border border-slate-200/80 shadow-xs">
-              <ImageIcon size={14} className="text-slate-500" />
-              <span>Gallery Photo</span>
-              <input type="file" accept="image/*" className="hidden"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); e.target.value = ""; }} />
-            </label>
-
-            <label className="flex items-center justify-center space-x-1.5 py-2.5 rounded-xl text-emerald-800 text-xs font-bold cursor-pointer hover:text-emerald-900 transition-colors bg-emerald-50 border border-emerald-200 shadow-xs">
-              <Layers size={14} className="text-emerald-700" />
-              <span>Bulk Upload Batch</span>
-              <input type="file" accept="image/*" multiple className="hidden"
-                onChange={(e) => { handleBatchSelect(e.target.files); e.target.value = ""; }} />
-            </label>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Interactive Batch Processing Modal */}
       {batchModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl animate-scale-up max-h-[85vh] flex flex-col">
+          <div className="bg-white rounded-3xl w-[calc(100vw-2rem)] max-w-sm p-5 space-y-4 shadow-2xl animate-scale-up max-h-[85vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center text-sm">
-                  🌽
+                  {activeCommodity.icon}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-sm">Bulk Corn Audit</h3>
+                  <h3 className="font-extrabold text-slate-900 text-sm">Bulk Receipt Audit</h3>
                   <p className="text-[10px] text-slate-500 font-medium">
-                    {batchProcessing ? "Analyzing receipt queue with Gemini AI..." : "Batch processing complete"}
+                    {batchProcessing
+                      ? "Analyzing receipt queue with Gemini AI..."
+                      : "Batch processing complete"}
                   </p>
                 </div>
               </div>
               {!batchProcessing && (
-                <button onClick={() => setBatchModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <button
+                  onClick={() => setBatchModalOpen(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
                   <X size={18} />
                 </button>
               )}
@@ -648,13 +947,17 @@ export default function HomePage() {
             {/* Summary Metrics Banner */}
             <div className="grid grid-cols-2 gap-2 bg-slate-50 rounded-2xl p-3 border border-slate-100">
               <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Incentive</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Total Incentive
+                </p>
                 <p className="text-base font-black text-emerald-700 mt-0.5">
                   +Rp {batchTotalReward.toLocaleString("en-US")}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Added Cost</p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                  Total Added Cost
+                </p>
                 <p className="text-base font-black text-slate-900 mt-0.5">
                   Rp {batchTotalCost.toLocaleString("en-US")}
                 </p>
@@ -681,7 +984,9 @@ export default function HomePage() {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-800 truncate text-[11px]">{item.merchant || item.filename}</p>
+                      <p className="font-bold text-slate-800 truncate text-[11px]">
+                        {item.merchant || item.filename}
+                      </p>
                       <p className="text-[9px] text-slate-400 font-medium">
                         {item.status === "processing"
                           ? "AI Auditing..."
@@ -692,10 +997,14 @@ export default function HomePage() {
 
                   <div className="text-right shrink-0">
                     {item.amount !== undefined && (
-                      <p className="font-extrabold text-slate-900 text-[11px]">Rp {item.amount.toLocaleString()}</p>
+                      <p className="font-extrabold text-slate-900 text-[11px]">
+                        Rp {item.amount.toLocaleString()}
+                      </p>
                     )}
                     {item.reward !== undefined && item.reward > 0 && (
-                      <p className="text-[9px] font-bold text-emerald-600">+Rp {item.reward.toLocaleString()}</p>
+                      <p className="text-[9px] font-bold text-emerald-600">
+                        +Rp {item.reward.toLocaleString()}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -710,7 +1019,9 @@ export default function HomePage() {
                   <span>Batch Voice Summary Available</span>
                 </div>
                 {batchTranscript && (
-                  <p className="text-[10px] text-purple-900 italic line-clamp-2">&ldquo;{batchTranscript}&rdquo;</p>
+                  <p className="text-[10px] text-purple-900 italic line-clamp-2">
+                    &ldquo;{batchTranscript}&rdquo;
+                  </p>
                 )}
                 <audio controls src={batchAudioUrl} className="w-full h-7 rounded-lg accent-purple-600" />
               </div>
@@ -739,7 +1050,7 @@ export default function HomePage() {
             ) : (
               <div className="flex items-center justify-center space-x-2 py-3 text-slate-500 text-xs font-semibold">
                 <Loader2 size={16} className="text-emerald-600 animate-spin" />
-                <span>Processing corn receipts batch...</span>
+                <span>Processing receipts batch...</span>
               </div>
             )}
           </div>
