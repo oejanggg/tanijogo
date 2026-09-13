@@ -5,6 +5,7 @@ export interface LedgerItem {
   user_id?: string | null;
   merchant_name: string;
   primary_category: string;
+  commodity?: "corn" | "chili" | "rice";
   quality_score: number;
   reward_earned: number;
   total_production_cost: number;
