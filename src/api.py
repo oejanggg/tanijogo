@@ -2,6 +2,7 @@ import os
 import shutil
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,7 +28,12 @@ app.add_middleware(
 )
 
 UPLOAD_DIR = "assets/uploads"
+AUDIO_DIR = "assets/audio_briefs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
+# Mount audio static directory for browser audio playback
+app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
 
 
 @app.get("/")
@@ -68,7 +74,11 @@ async def audit_receipt_file(file: UploadFile = File(...)):
 
         # Step 4: ElevenLabs Spoken Indonesian Voice Brief
         script = generate_farmer_script(evaluation, payout_idr=payout, hpp_financials=financials)
-        voice_res = synthesize_audio_brief(script, output_filename=f"assets/audio_briefs/{original_filename}_brief.mp3")
+        audio_filename = f"{os.path.splitext(original_filename)[0]}_brief.mp3"
+        audio_path = os.path.join(AUDIO_DIR, audio_filename)
+        voice_res = synthesize_audio_brief(script, output_filename=audio_path)
+
+        audio_url = f"/audio/{audio_filename}" if voice_res.get("status") == "success" else ""
 
         # Response payload matching both WebApps_Demo frontend and API contracts
         return {
@@ -81,6 +91,7 @@ async def audit_receipt_file(file: UploadFile = File(...)):
             "voice_brief": {
                 "transcript": script,
                 "status": voice_res["status"],
+                "audio_url": audio_url,
                 "audio_path": voice_res.get("audio_path", "")
             }
         }

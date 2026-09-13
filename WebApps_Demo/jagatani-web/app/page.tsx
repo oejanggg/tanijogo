@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Upload, Wallet, AlertTriangle, CheckCircle2, Receipt } from 'lucide-react';
+import { Upload, Wallet, AlertTriangle, CheckCircle2, Receipt, Volume2 } from 'lucide-react';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -48,7 +48,6 @@ export default function Home() {
         body: formData,
       });
 
-      // Handle non-200 HTTP responses (e.g., 500 Internal Server Error)
       if (!res.ok) {
         const errorDetails = await res.text();
         console.error(`Backend error (${res.status}):`, errorDetails);
@@ -59,7 +58,6 @@ export default function Home() {
       const data = await res.json();
       setResult(data);
 
-      // Support both payload formats: transaction_record or evaluation
       const rec = data.transaction_record || data.evaluation;
       const fin = data.financials || {};
 
@@ -77,7 +75,6 @@ export default function Home() {
         if (insertError) {
           console.error("Supabase insert error:", insertError);
         } else {
-          // Refresh the UI ledger after successful insertion
           fetchLedger();
         }
       }
@@ -137,10 +134,13 @@ export default function Home() {
             const record = result.transaction_record || result.evaluation;
             const financials = result.financials || {};
             const reward = dataReward(result, record);
+            const voice = result.voice_brief || {};
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            const audioSrc = voice.audio_url ? `${apiBaseUrl}${voice.audio_url}` : null;
 
             return (
-              <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between border-b pb-4 mb-4">
+              <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                <div className="flex items-center justify-between border-b pb-4">
                   <h2 className="font-bold text-xl">Audit Verdict</h2>
                   {record.is_original_receipt ? (
                     <span className="flex items-center text-emerald-600 text-sm font-bold bg-emerald-50 px-3 py-1 rounded-full">
@@ -153,7 +153,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-3 rounded-lg text-center">
                     <p className="text-xs text-gray-500 uppercase font-semibold">Quality Score</p>
                     <p className="text-2xl font-bold text-gray-800">{record.image_quality_score}/10</p>
@@ -164,6 +164,30 @@ export default function Home() {
                   </div>
                 </div>
 
+                {/* Spoken Indonesian Voice Brief (ElevenLabs Integration) */}
+                {voice.transcript && (
+                  <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="flex items-center text-purple-900 font-bold text-sm">
+                        <Volume2 size={18} className="mr-1 text-purple-600" /> Audio Brief (Pak Joko)
+                      </span>
+                      <span className="text-[10px] uppercase tracking-wider font-bold bg-purple-200 text-purple-800 px-2 py-0.5 rounded">
+                        Built with ElevenLabs
+                      </span>
+                    </div>
+                    <p className="text-xs text-purple-900 leading-relaxed italic bg-white/60 p-2.5 rounded-lg border border-purple-100">
+                      "{voice.transcript}"
+                    </p>
+                    {audioSrc && (
+                      <audio controls className="w-full mt-3 h-8 rounded-lg">
+                        <source src={audioSrc} type="audio/mpeg" />
+                        Your browser does not support the audio element.
+                      </audio>
+                    )}
+                  </div>
+                )}
+
+                {/* Financial Intelligence */}
                 <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                   <h3 className="font-bold text-blue-900 mb-1">Financial Intelligence</h3>
                   {record.estimated_yield_kg && (
