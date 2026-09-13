@@ -71,8 +71,8 @@ def generate_farmer_script(
         f"Kejelasan foto nota bernilai {score} dari 10. "
         f"Anda mendapatkan insentif tunai sebesar {payout_str}. "
         f"Total biaya produksi panen ini tercatat {cost_str}. "
-        f"Target harga jual break-even H.P.P. Anda adalah {hpp_str} per kilo. "
-        f"Jangan jual di bawah harga H.P.P. agar tidak rugi. Sukses panennya!"
+        f"Target harga jual break-even Ha Pe Pe Anda adalah {hpp_str} per kilo. "
+        f"Jangan jual di bawah harga Ha Pe Pe agar tidak rugi. Sukses panennya!"
     )
     return script
 
