@@ -9,8 +9,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "TaniJaga – AI Farm Financial Engine for Corn Farmers",
-  description: "AI-powered financial audit, HPP calculation, and cash incentives specifically for Indonesian corn farmers.",
+  title: "TaniJaga – Farmer's Cost Ledger",
+  description: "Farmer's Cost Ledger, BEP calculation, and receipt audit platform for Indonesian smallholder farmers.",
 };
 
 export const viewport: Viewport = {

@@ -27,7 +27,7 @@ from backend.voice import (
 
 app = FastAPI(
     title="TaniJaga Financial Intelligence API",
-    description="AI Farm Financial Engine & Auditing Platform for Indonesian Corn Farmers",
+    description="Farmer's Cost Ledger & Auditing Platform for Indonesian Farmers",
     version="2.0.0"
 )
 
@@ -126,21 +126,11 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         # Step 1: Gemini Vision OCR Audit
         evaluation = analyze_receipt(temp_path)
 
-        # Step 2: Dual-Layer Check for Duplicate Receipt Submission
+        # Step 2: Dual-Layer Check for Duplicate Receipt Submission (Rejection revoked per user request)
         content_fingerprint = compute_receipt_content_fingerprint(evaluation)
-        is_image_duplicate = image_hash in AUDITED_IMAGE_HASHES
-        is_content_duplicate = content_fingerprint in AUDITED_CONTENT_FINGERPRINTS
-
-        if is_image_duplicate or is_content_duplicate:
-            evaluation.is_original_receipt = False
-            evaluation.primary_receipt_category = "INVALID"
-            reason = "Receipt image was already submitted previously" if is_image_duplicate else "Identical transaction details already recorded in system"
-            flag_msg = f"Duplicate Detected: {reason}"
-            if flag_msg not in evaluation.fraud_flags:
-                evaluation.fraud_flags.append(flag_msg)
-        else:
-            AUDITED_IMAGE_HASHES.add(image_hash)
-            AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
+        # Allow multi-upload of same document: do not flag as duplicate or INVALID
+        AUDITED_IMAGE_HASHES.add(image_hash)
+        AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
 
         # Step 3: HPP & Micro-Cash Reward Calculation for Corn
         payout = calculate_reward(evaluation)
@@ -222,21 +212,10 @@ async def audit_receipts_batch(files: List[UploadFile] = File(...)):
             # Step 1: Gemini OCR Analysis
             evaluation = analyze_receipt(temp_path)
 
-            # Step 2: Duplicate Check
+            # Step 2: Duplicate Check (Rejection revoked per user request to allow multi-upload)
             content_fingerprint = compute_receipt_content_fingerprint(evaluation)
-            is_image_duplicate = image_hash in AUDITED_IMAGE_HASHES
-            is_content_duplicate = content_fingerprint in AUDITED_CONTENT_FINGERPRINTS
-
-            if is_image_duplicate or is_content_duplicate:
-                evaluation.is_original_receipt = False
-                evaluation.primary_receipt_category = "INVALID"
-                reason = "Receipt image was already submitted previously" if is_image_duplicate else "Identical transaction details already recorded in system"
-                flag_msg = f"Duplicate Detected: {reason}"
-                if flag_msg not in evaluation.fraud_flags:
-                    evaluation.fraud_flags.append(flag_msg)
-            else:
-                AUDITED_IMAGE_HASHES.add(image_hash)
-                AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
+            AUDITED_IMAGE_HASHES.add(image_hash)
+            AUDITED_CONTENT_FINGERPRINTS.add(content_fingerprint)
 
             # Step 3: Financials for Corn
             payout = calculate_reward(evaluation)

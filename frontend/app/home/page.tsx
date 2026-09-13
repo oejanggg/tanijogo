@@ -48,7 +48,7 @@ const COMMODITIES: Record<CommodityType, CommodityInfo> = {
     icon: "🌽",
     unit: "kg dry kernel",
     marketPrice: 5500,
-    benchmarkAgency: "Bapanas Benchmark",
+    benchmarkAgency: "Bapenas Benchmark",
     defaultHpp: 4200,
     history3Months: [
       { month: "July 2026", monthShort: "Jul", marketPrice: 5200, hpp: 4100 },
@@ -71,7 +71,7 @@ const COMMODITIES: Record<CommodityType, CommodityInfo> = {
       { month: "August 2026", monthShort: "Aug", marketPrice: 35000, hpp: 24500 },
       { month: "September 2026", monthShort: "Sep", marketPrice: 32000, hpp: 23200 },
     ],
-    guideText: "Chili prices fluctuate rapidly. Keeping HPP under Rp 28,000 shields against sudden dips.",
+    guideText: "Chili prices fluctuate rapidly. Keeping BEP under Rp 28,000 shields against sudden dips.",
   },
   rice: {
     id: "rice",
@@ -80,7 +80,7 @@ const COMMODITIES: Record<CommodityType, CommodityInfo> = {
     icon: "🌾",
     unit: "kg dry grain (GKG)",
     marketPrice: 7200,
-    benchmarkAgency: "HPP Bapanas GKG",
+    benchmarkAgency: "BEP Bapenas GKG",
     defaultHpp: 5250,
     history3Months: [
       { month: "July 2026", monthShort: "Jul", marketPrice: 6800, hpp: 5100 },
@@ -191,10 +191,10 @@ function ThreeMonthPriceChart({
                     <span className="text-[8px] font-bold text-amber-700 mt-1">Mkt</span>
                   </div>
 
-                  {/* Farmer HPP Bar */}
+                  {/* Farmer BEP Bar */}
                   <div className="flex-1 flex flex-col items-center group relative cursor-pointer h-full justify-end">
                     <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[9px] font-bold py-0.5 px-1 rounded whitespace-nowrap z-20 pointer-events-none shadow-md">
-                      Cost: Rp {d.hpp.toLocaleString()}
+                      BEP: Rp {d.hpp.toLocaleString()}
                     </div>
                     <div
                       className={`w-full rounded-t-md transition-all duration-500 ${
@@ -205,7 +205,7 @@ function ThreeMonthPriceChart({
                       style={{ height: `${hppHeight}%` }}
                     />
                     <span className={`text-[8px] font-bold mt-1 ${prof ? "text-emerald-700" : "text-rose-600"}`}>
-                      Cost
+                      BEP
                     </span>
                   </div>
                 </div>
@@ -234,7 +234,7 @@ function ThreeMonthPriceChart({
         </div>
         <div className="flex items-center space-x-1.5">
           <span className="w-2.5 h-2.5 bg-emerald-500 rounded-xs" />
-          <span className="font-semibold text-slate-700">Farm Cost (HPP)</span>
+          <span className="font-semibold text-slate-700">Farm Cost (BEP)</span>
         </div>
         <div className="flex items-center space-x-1.5">
           <span className="w-2.5 h-2.5 bg-rose-400 rounded-xs" />
@@ -605,7 +605,7 @@ export default function HomePage() {
             <div className="min-w-0">
               <h1 className="text-white font-extrabold text-base leading-none truncate">TaniJaga</h1>
               <p className="text-emerald-300/70 text-[10px] font-medium mt-0.5 truncate">
-                AI Farm Financial Engine
+                Farmer&apos;s Cost Ledger
               </p>
             </div>
           </div>
@@ -665,12 +665,12 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* Break-even HPP Card for selected commodity */}
+        {/* Break-even Point Card for selected commodity */}
         <div className="bg-gradient-to-br from-emerald-700 to-teal-700 rounded-3xl p-4 sm:p-5 text-white shadow-lg shadow-emerald-700/20 relative overflow-hidden">
           <div className="absolute -top-6 -right-6 w-32 h-32 bg-white/5 rounded-full blur-xl" />
           <div className="flex items-center justify-between">
             <p className="text-emerald-100/80 text-xs font-bold uppercase tracking-widest">
-              {activeCommodity.shortName} Break-even HPP
+              {activeCommodity.shortName} Break Even Point
             </p>
             <span className="text-[10px] font-extrabold bg-white/20 px-2 py-0.5 rounded-full">
               {activeCommodity.icon} {activeCommodity.shortName}
@@ -689,7 +689,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 3-Month Price & HPP Chart Card */}
+        {/* 3-Month Price & BEP Chart Card */}
         <div className="bg-white rounded-3xl p-4 shadow-xs border border-slate-100">
           <div className="flex items-center justify-between mb-3">
             <div>
@@ -697,7 +697,7 @@ export default function HomePage() {
                 3-Month Price &amp; Cost Trend
               </h3>
               <p className="text-[10px] text-slate-500 font-medium">
-                {activeCommodity.name} benchmark vs. farm HPP
+                {activeCommodity.name} benchmark vs. farm BEP
               </p>
             </div>
             <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
@@ -733,7 +733,7 @@ export default function HomePage() {
                     (isAboveMarket ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-700")
                   }
                 >
-                  {isAboveMarket ? "▲ PROFITABLE" : "▼ BELOW HPP"}
+                  {isAboveMarket ? "▲ PROFITABLE" : "▼ BELOW BEP"}
                 </span>
               </div>
             </div>
@@ -758,7 +758,7 @@ export default function HomePage() {
                 >
                   {isAboveMarket
                     ? `+Rp ${(activeCommodity.marketPrice - hpp).toLocaleString()} profit margin`
-                    : "Below your HPP"}
+                    : "Below your BEP"}
                 </span>
               </div>
             </div>

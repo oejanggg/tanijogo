@@ -79,7 +79,7 @@ export default function ConfirmPage() {
         </button>
         <h1 className="text-xl font-extrabold text-slate-900">Confirm & Classify</h1>
         <p className="text-slate-500 text-xs font-medium mt-0.5">
-          We&#39;ll use this amount to update your break-even price.
+          We&#39;ll use this amount to update your Break Even Point (BEP).
         </p>
       </header>
 

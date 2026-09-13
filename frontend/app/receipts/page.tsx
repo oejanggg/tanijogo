@@ -335,7 +335,7 @@ export default function ReceiptsPage() {
                         <div className="px-4 pb-4 space-y-2.5 border-t border-slate-100 pt-3">
                           {row.hpp_per_kg > 0 && (
                             <div className="bg-amber-50 rounded-xl px-3 py-2 flex items-center justify-between border border-amber-100">
-                              <span className="text-xs text-amber-800 font-semibold">Corn HPP / kg</span>
+                              <span className="text-xs text-amber-800 font-semibold">BEP / kg</span>
                               <span className="text-xs font-extrabold text-amber-900">Rp {row.hpp_per_kg.toLocaleString("en-US")}</span>
                             </div>
                           )}

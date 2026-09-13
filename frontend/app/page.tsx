@@ -37,7 +37,7 @@ export default function LandingPage() {
               TaniJaga
             </h1>
             <p className="text-emerald-300/90 text-xs sm:text-sm font-semibold tracking-wide uppercase">
-              AI Farm Financial Engine · Multi-Commodity
+              Farmer&apos;s Cost Ledger · Multi-Commodity
             </p>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default function LandingPage() {
         <div className="w-full space-y-2.5">
           {[
             { icon: Shield, text: "Audit receipts & bulk upload (Corn, Chili, Rice)" },
-            { icon: TrendingUp, text: "3-month price history & real-time break-even HPP" },
+            { icon: TrendingUp, text: "3-month price history & real-time Break Even Point (BEP)" },
             { icon: Mic, text: "English voice briefs powered by ElevenLabs AI" },
           ].map(({ icon: Icon, text }) => (
             <div key={text} className="bg-white/8 backdrop-blur-sm rounded-2xl px-3.5 py-3 border border-white/10 flex items-center space-x-3">

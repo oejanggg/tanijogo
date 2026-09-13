@@ -201,7 +201,7 @@ export default function HarvestPage() {
               National {activeCrop.shortName} Benchmark: Rp {activeCrop.benchmarkPrice.toLocaleString()} / kg
             </p>
             <p className="text-[10px] text-amber-700 leading-relaxed mt-0.5">
-              Government reference price. Enter your harvest numbers below to ensure your wholesale selling price stays safely above your HPP.
+              Government reference price. Enter your harvest numbers below to ensure your wholesale selling price stays safely above your BEP.
             </p>
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function HarvestPage() {
                 <span>✓ Saved to Database!</span>
               </>
             ) : (
-              <span>Save &amp; Calculate Break-even</span>
+              <span>Save &amp; Calculate Break Even Point</span>
             )}
           </button>
         </div>
@@ -284,7 +284,7 @@ export default function HarvestPage() {
           <div>
             <h2 className="font-extrabold text-slate-800 text-sm">Season Financial Result</h2>
             <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-              Break-even target vs actual market outcome
+              Break Even Point (BEP) target vs actual market outcome
             </p>
           </div>
 
@@ -323,7 +323,7 @@ export default function HarvestPage() {
                   </p>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 font-bold uppercase">Break-even Cost</span>
+                  <span className="text-[10px] text-slate-500 font-bold uppercase">Break Even Point (BEP)</span>
                   <p className="font-bold text-slate-900 mt-0.5">
                     Rp {breakEvenRevenue.toLocaleString("en-US")}
                   </p>
@@ -337,8 +337,8 @@ export default function HarvestPage() {
                 }
               >
                 {isProfitable
-                  ? `🎉 Excellent work! Your selling price (Rp ${priceNum.toLocaleString()}/kg) exceeds your break-even cost (Rp ${Math.round(effectiveHpp).toLocaleString()}/kg).`
-                  : `⚠️ Your selling price (Rp ${priceNum.toLocaleString()}/kg) is below your break-even cost (Rp ${Math.round(effectiveHpp).toLocaleString()}/kg). Review receipts to identify cost drivers.`}
+                  ? `🎉 Excellent work! Your selling price (Rp ${priceNum.toLocaleString()}/kg) exceeds your Break Even Point (Rp ${Math.round(effectiveHpp).toLocaleString()}/kg).`
+                  : `⚠️ Your selling price (Rp ${priceNum.toLocaleString()}/kg) is below your Break Even Point (Rp ${Math.round(effectiveHpp).toLocaleString()}/kg). Review receipts to identify cost drivers.`}
               </p>
             </div>
           ) : (
