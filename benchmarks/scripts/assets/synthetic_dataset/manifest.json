@@ -1,0 +1,1548 @@
+[
+  {
+    "id": 1,
+    "filename": "assets/synthetic_dataset/receipt_001_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Hasil Tani Pak Dadang (Lembang)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 721100,
+    "actual_total_idr": 721100,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk Kalsium (Cegah Rontok Bunga)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 31000,
+        "line_total": 62000
+      },
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "3 Unit/Kg",
+        "unit_price": 113000,
+        "line_total": 339000
+      },
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 53000,
+        "line_total": 318000
+      },
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "3 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 2100
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "filename": "assets/synthetic_dataset/receipt_002_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Koperasi Tani SukaTani (Wonosobo)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 313000,
+    "actual_total_idr": 313000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 61000,
+        "line_total": 305000
+      },
+      {
+        "name": "Upah Petik Cabai Panen Ke-1 s/d Ke-15",
+        "qty": "2 Unit/Kg",
+        "unit_price": 4000,
+        "line_total": 8000
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "filename": "assets/synthetic_dataset/receipt_003_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Bawang Pak Harto (Wonosobo)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 1765400,
+    "actual_total_idr": 1765400,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Kapur Pertanian (Dolomit) Netralisir pH",
+        "qty": "3 Unit/Kg",
+        "unit_price": 800,
+        "line_total": 2400
+      },
+      {
+        "name": "Upah Cabut Lanjaran (Bambu) & Simpan",
+        "qty": "6 Unit/Kg",
+        "unit_price": 106000,
+        "line_total": 636000
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "7 Unit/Kg",
+        "unit_price": 156000,
+        "line_total": 1092000
+      },
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "10 Unit/Kg",
+        "unit_price": 3500,
+        "line_total": 35000
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "filename": "assets/synthetic_dataset/receipt_004_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "UD Subur Jaya (Banyuwangi)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 1714300,
+    "actual_total_idr": 1714300,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "8 Unit/Kg",
+        "unit_price": 173000,
+        "line_total": 1384000
+      },
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 6300
+      },
+      {
+        "name": "Pupuk Kandang Ayam Fermentasi",
+        "qty": "3 Unit/Kg",
+        "unit_price": 34000,
+        "line_total": 102000
+      },
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 37000,
+        "line_total": 222000
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "filename": "assets/synthetic_dataset/receipt_005_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Toko Sarana Tani (Tabanan)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 2226000,
+    "actual_total_idr": 2226000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "7 Unit/Kg",
+        "unit_price": 97000,
+        "line_total": 679000
+      },
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "7 Unit/Kg",
+        "unit_price": 50000,
+        "line_total": 350000
+      },
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "7 Unit/Kg",
+        "unit_price": 171000,
+        "line_total": 1197000
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "filename": "assets/synthetic_dataset/receipt_006_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "UD Subur Jaya (Wonosobo)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 2286300,
+    "actual_total_idr": 2286300,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "10 Unit/Kg",
+        "unit_price": 173000,
+        "line_total": 1730000
+      },
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 55000,
+        "line_total": 330000
+      },
+      {
+        "name": "Pupuk Kandang Ayam Fermentasi",
+        "qty": "10 Unit/Kg",
+        "unit_price": 22000,
+        "line_total": 220000
+      },
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 6300
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "filename": "assets/synthetic_dataset/receipt_007_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Bawang Pak Harto (Wonosobo)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 1147000,
+    "actual_total_idr": 1147000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "4 Unit/Kg",
+        "unit_price": 103000,
+        "line_total": 412000
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 147000,
+        "line_total": 735000
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "filename": "assets/synthetic_dataset/receipt_008_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Toko Sarana Tani (Brebes)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 2923000,
+    "actual_total_idr": 2923000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk Kandang Ayam Fermentasi",
+        "qty": "10 Unit/Kg",
+        "unit_price": 29000,
+        "line_total": 290000
+      },
+      {
+        "name": "Media Tanam Semai & Tray Semai",
+        "qty": "6 Unit/Kg",
+        "unit_price": 353000,
+        "line_total": 2118000
+      },
+      {
+        "name": "Upah Pindah Tanam Bibit",
+        "qty": "5 Unit/Kg",
+        "unit_price": 103000,
+        "line_total": 515000
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "filename": "assets/synthetic_dataset/receipt_009_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Wonosobo)",
+    "quality_score": 8,
+    "is_original_receipt": true,
+    "reported_total_idr": 744000,
+    "actual_total_idr": 744000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Kapur Pertanian (Dolomit) Netralisir pH",
+        "qty": "10 Unit/Kg",
+        "unit_price": 800,
+        "line_total": 8000
+      },
+      {
+        "name": "Upah Cabut Lanjaran (Bambu) & Simpan",
+        "qty": "8 Unit/Kg",
+        "unit_price": 92000,
+        "line_total": 736000
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "filename": "assets/synthetic_dataset/receipt_010_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Hasil Tani Pak Dadang (Wonosobo)",
+    "quality_score": 8,
+    "is_original_receipt": true,
+    "reported_total_idr": 4620900,
+    "actual_total_idr": 4620900,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "7 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 4900
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "8 Unit/Kg",
+        "unit_price": 151000,
+        "line_total": 1208000
+      },
+      {
+        "name": "Plastik Mulsa Hitam Perak",
+        "qty": "6 Unit/Kg",
+        "unit_price": 568000,
+        "line_total": 3408000
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "filename": "assets/synthetic_dataset/receipt_011_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Toko Sarana Tani (Brebes)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 3466800,
+    "actual_total_idr": 3466800,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Plastik Mulsa Hitam Perak",
+        "qty": "6 Unit/Kg",
+        "unit_price": 547000,
+        "line_total": 3282000
+      },
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "4 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 2800
+      },
+      {
+        "name": "Pupuk Kandang Ayam Fermentasi",
+        "qty": "7 Unit/Kg",
+        "unit_price": 26000,
+        "line_total": 182000
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "filename": "assets/synthetic_dataset/receipt_012_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Brebes)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 2162000,
+    "actual_total_idr": 2162000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "8 Unit/Kg",
+        "unit_price": 160000,
+        "line_total": 1280000
+      },
+      {
+        "name": "Upah Pindah Tanam Bibit",
+        "qty": "9 Unit/Kg",
+        "unit_price": 98000,
+        "line_total": 882000
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "filename": "assets/synthetic_dataset/receipt_013_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Malang)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 2548100,
+    "actual_total_idr": 2548100,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "3 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 2100
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "10 Unit/Kg",
+        "unit_price": 154000,
+        "line_total": 1540000
+      },
+      {
+        "name": "Pupuk Kalsium (Cegah Rontok Bunga)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 35000,
+        "line_total": 70000
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "9 Unit/Kg",
+        "unit_price": 104000,
+        "line_total": 936000
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "filename": "assets/synthetic_dataset/receipt_014_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Banyuwangi)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 362500,
+    "actual_total_idr": 362500,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "8 Unit/Kg",
+        "unit_price": 44000,
+        "line_total": 352000
+      },
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "3 Unit/Kg",
+        "unit_price": 3500,
+        "line_total": 10500
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "filename": "assets/synthetic_dataset/receipt_015_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Hasil Tani Pak Dadang (Blitar)",
+    "quality_score": 8,
+    "is_original_receipt": true,
+    "reported_total_idr": 15563500,
+    "actual_total_idr": 15563500,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "7 Unit/Kg",
+        "unit_price": 2500,
+        "line_total": 17500
+      },
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "5 Unit/Kg",
+        "unit_price": 2787000,
+        "line_total": 13935000
+      },
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 183000,
+        "line_total": 915000
+      },
+      {
+        "name": "Upah Pindah Tanam Bibit",
+        "qty": "8 Unit/Kg",
+        "unit_price": 87000,
+        "line_total": 696000
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "filename": "assets/synthetic_dataset/receipt_016_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Garut)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 16850000,
+    "actual_total_idr": 16850000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 164000,
+        "line_total": 820000
+      },
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "5 Unit/Kg",
+        "unit_price": 3206000,
+        "line_total": 16030000
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "filename": "assets/synthetic_dataset/receipt_017_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Toko Sarana Tani (Malang)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 14660500,
+    "actual_total_idr": 14660500,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "9 Unit/Kg",
+        "unit_price": 2500,
+        "line_total": 22500
+      },
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "1 Unit/Kg",
+        "unit_price": 48000,
+        "line_total": 48000
+      },
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "5 Unit/Kg",
+        "unit_price": 2918000,
+        "line_total": 14590000
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "filename": "assets/synthetic_dataset/receipt_018_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Gudang Hasil Panen Pak Slamet (Probolinggo)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 23863000,
+    "actual_total_idr": 23863000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Upah Petik Cabai Panen Ke-1 s/d Ke-15",
+        "qty": "5 Unit/Kg",
+        "unit_price": 3000,
+        "line_total": 15000
+      },
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "4 Unit/Kg",
+        "unit_price": 114000,
+        "line_total": 456000
+      },
+      {
+        "name": "Benih Cabai Merah Hibrida (Kopay/Baja)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 164000,
+        "line_total": 820000
+      },
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "9 Unit/Kg",
+        "unit_price": 2508000,
+        "line_total": 22572000
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "filename": "assets/synthetic_dataset/receipt_019_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Bawang Pak Harto (Medan)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 169200,
+    "actual_total_idr": 169200,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk Kalsium (Cegah Rontok Bunga)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 33000,
+        "line_total": 66000
+      },
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 4200
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "1 Unit/Kg",
+        "unit_price": 99000,
+        "line_total": 99000
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "filename": "assets/synthetic_dataset/receipt_020_clean.jpg",
+    "category_type": "clean",
+    "merchant_name": "Pengepul Hasil Tani Pak Dadang (Brebes)",
+    "quality_score": 8,
+    "is_original_receipt": true,
+    "reported_total_idr": 24723000,
+    "actual_total_idr": 24723000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Media Tanam Semai & Tray Semai",
+        "qty": "6 Unit/Kg",
+        "unit_price": 400000,
+        "line_total": 2400000
+      },
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "7 Unit/Kg",
+        "unit_price": 3009000,
+        "line_total": 21063000
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 140000,
+        "line_total": 1260000
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "filename": "assets/synthetic_dataset/receipt_021_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Toko Tani Makmur (Malang)",
+    "quality_score": 3,
+    "is_original_receipt": true,
+    "reported_total_idr": 9093000,
+    "actual_total_idr": 9093000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "3 Unit/Kg",
+        "unit_price": 2571000,
+        "line_total": 7713000
+      },
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 60000,
+        "line_total": 360000
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "10 Unit/Kg",
+        "unit_price": 102000,
+        "line_total": 1020000
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "filename": "assets/synthetic_dataset/receipt_022_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Gudang Hasil Panen Pak Slamet (Banyuwangi)",
+    "quality_score": 3,
+    "is_original_receipt": true,
+    "reported_total_idr": 1614000,
+    "actual_total_idr": 1614000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "6 Unit/Kg",
+        "unit_price": 3500,
+        "line_total": 21000
+      },
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 177000,
+        "line_total": 1593000
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "filename": "assets/synthetic_dataset/receipt_023_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Gudang Hasil Panen Pak Slamet (Blitar)",
+    "quality_score": 4,
+    "is_original_receipt": true,
+    "reported_total_idr": 3100000,
+    "actual_total_idr": 3100000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "8 Unit/Kg",
+        "unit_price": 38000,
+        "line_total": 304000
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 176000,
+        "line_total": 1584000
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "8 Unit/Kg",
+        "unit_price": 108000,
+        "line_total": 864000
+      },
+      {
+        "name": "Upah Cabut Lanjaran (Bambu) & Simpan",
+        "qty": "3 Unit/Kg",
+        "unit_price": 116000,
+        "line_total": 348000
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "filename": "assets/synthetic_dataset/receipt_024_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Pengepul Bawang Pak Harto (Malang)",
+    "quality_score": 2,
+    "is_original_receipt": true,
+    "reported_total_idr": 986000,
+    "actual_total_idr": 986000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk Kandang Ayam Fermentasi",
+        "qty": "2 Unit/Kg",
+        "unit_price": 31000,
+        "line_total": 62000
+      },
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "1 Unit/Kg",
+        "unit_price": 159000,
+        "line_total": 159000
+      },
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "3 Unit/Kg",
+        "unit_price": 45000,
+        "line_total": 135000
+      },
+      {
+        "name": "Upah Pekerja Perawatan Rutin (Kocor/Semprot)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 105000,
+        "line_total": 630000
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "filename": "assets/synthetic_dataset/receipt_025_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Koperasi Tani SukaTani (Medan)",
+    "quality_score": 3,
+    "is_original_receipt": true,
+    "reported_total_idr": 3839000,
+    "actual_total_idr": 3839000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 42000,
+        "line_total": 378000
+      },
+      {
+        "name": "Sewa Traktor & Pembuatan Bedengan",
+        "qty": "1 Unit/Kg",
+        "unit_price": 3461000,
+        "line_total": 3461000
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "filename": "assets/synthetic_dataset/receipt_026_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Probolinggo)",
+    "quality_score": 3,
+    "is_original_receipt": true,
+    "reported_total_idr": 728000,
+    "actual_total_idr": 728000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk NPK Mutiara (Sistem Kocor)",
+        "qty": "7 Unit/Kg",
+        "unit_price": 16000,
+        "line_total": 112000
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "4 Unit/Kg",
+        "unit_price": 109000,
+        "line_total": 436000
+      },
+      {
+        "name": "Upah Pekerja Perawatan Rutin (Kocor/Semprot)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 90000,
+        "line_total": 180000
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "filename": "assets/synthetic_dataset/receipt_027_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Pengepul Hasil Tani Pak Dadang (Lembang)",
+    "quality_score": 3,
+    "is_original_receipt": true,
+    "reported_total_idr": 8224000,
+    "actual_total_idr": 8224000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Media Tanam Semai & Tray Semai",
+        "qty": "9 Unit/Kg",
+        "unit_price": 434000,
+        "line_total": 3906000
+      },
+      {
+        "name": "Plastik Mulsa Hitam Perak",
+        "qty": "7 Unit/Kg",
+        "unit_price": 571000,
+        "line_total": 3997000
+      },
+      {
+        "name": "Upah Cabut Lanjaran (Bambu) & Simpan",
+        "qty": "3 Unit/Kg",
+        "unit_price": 107000,
+        "line_total": 321000
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "filename": "assets/synthetic_dataset/receipt_028_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Toko Sarana Tani (Banyuwangi)",
+    "quality_score": 2,
+    "is_original_receipt": true,
+    "reported_total_idr": 1347000,
+    "actual_total_idr": 1347000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "3 Unit/Kg",
+        "unit_price": 109000,
+        "line_total": 327000
+      },
+      {
+        "name": "Pupuk Kalsium (Cegah Rontok Bunga)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 30000,
+        "line_total": 180000
+      },
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 168000,
+        "line_total": 840000
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "filename": "assets/synthetic_dataset/receipt_029_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Gudang Hasil Panen Pak Slamet (Medan)",
+    "quality_score": 2,
+    "is_original_receipt": true,
+    "reported_total_idr": 2873900,
+    "actual_total_idr": 2873900,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "8 Unit/Kg",
+        "unit_price": 107000,
+        "line_total": 856000
+      },
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "7 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 4900
+      },
+      {
+        "name": "Media Tanam Semai & Tray Semai",
+        "qty": "3 Unit/Kg",
+        "unit_price": 436000,
+        "line_total": 1308000
+      },
+      {
+        "name": "Benih Cabai Merah Hibrida (Kopay/Baja)",
+        "qty": "5 Unit/Kg",
+        "unit_price": 141000,
+        "line_total": 705000
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "filename": "assets/synthetic_dataset/receipt_030_unreadable.jpg",
+    "category_type": "unreadable",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Probolinggo)",
+    "quality_score": 2,
+    "is_original_receipt": true,
+    "reported_total_idr": 1122000,
+    "actual_total_idr": 1122000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Plastik Mulsa Hitam Perak",
+        "qty": "1 Unit/Kg",
+        "unit_price": 552000,
+        "line_total": 552000
+      },
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "10 Unit/Kg",
+        "unit_price": 57000,
+        "line_total": 570000
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "filename": "assets/synthetic_dataset/receipt_031_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "UD Subur Jaya (Lembang)",
+    "quality_score": 6,
+    "is_original_receipt": false,
+    "reported_total_idr": 1859000,
+    "actual_total_idr": 1809000,
+    "fraud_flags": [
+      "Total aritmatika nota tidak cocok dengan rincian item"
+    ],
+    "items": [
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "9 Unit/Kg",
+        "unit_price": 97000,
+        "line_total": 873000
+      },
+      {
+        "name": "Upah Cabut Lanjaran (Bambu) & Simpan",
+        "qty": "9 Unit/Kg",
+        "unit_price": 104000,
+        "line_total": 936000
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "filename": "assets/synthetic_dataset/receipt_032_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Toko Sarana Tani (Tabanan)",
+    "quality_score": 7,
+    "is_original_receipt": false,
+    "reported_total_idr": 668000,
+    "actual_total_idr": 618000,
+    "fraud_flags": [
+      "Total aritmatika nota tidak cocok dengan rincian item"
+    ],
+    "items": [
+      {
+        "name": "Upah Petik Cabai Panen Ke-1 s/d Ke-15",
+        "qty": "10 Unit/Kg",
+        "unit_price": 3000,
+        "line_total": 30000
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "6 Unit/Kg",
+        "unit_price": 98000,
+        "line_total": 588000
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "filename": "assets/synthetic_dataset/receipt_033_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Toko Sarana Tani (Medan)",
+    "quality_score": 5,
+    "is_original_receipt": false,
+    "reported_total_idr": 940000,
+    "actual_total_idr": 940000,
+    "fraud_flags": [
+      "Potongan susut 18% melebihi batas standar regional 8%"
+    ],
+    "items": [
+      {
+        "name": "Upah Pindah Tanam Bibit",
+        "qty": "10 Unit/Kg",
+        "unit_price": 83000,
+        "line_total": 830000
+      },
+      {
+        "name": "Pupuk Kalsium (Cegah Rontok Bunga)",
+        "qty": "1 Unit/Kg",
+        "unit_price": 38000,
+        "line_total": 38000
+      },
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 36000,
+        "line_total": 72000
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "filename": "assets/synthetic_dataset/receipt_034_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Koperasi Tani SukaTani (Blitar)",
+    "quality_score": 5,
+    "is_original_receipt": false,
+    "reported_total_idr": 658000,
+    "actual_total_idr": 508000,
+    "fraud_flags": [
+      "Total aritmatika nota tidak cocok dengan rincian item"
+    ],
+    "items": [
+      {
+        "name": "Benih Cabai Merah Hibrida (Kopay/Baja)",
+        "qty": "1 Unit/Kg",
+        "unit_price": 157000,
+        "line_total": 157000
+      },
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "4 Unit/Kg",
+        "unit_price": 54000,
+        "line_total": 216000
+      },
+      {
+        "name": "Pupuk NPK Mutiara (Sistem Kocor)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 15000,
+        "line_total": 135000
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "filename": "assets/synthetic_dataset/receipt_035_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "UD Subur Jaya (Probolinggo)",
+    "quality_score": 6,
+    "is_original_receipt": false,
+    "reported_total_idr": 906500,
+    "actual_total_idr": 906500,
+    "fraud_flags": [
+      "Foto terdeteksi berasal dari layar laptop/HP (bukan fisik)"
+    ],
+    "items": [
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "2 Unit/Kg",
+        "unit_price": 109000,
+        "line_total": 218000
+      },
+      {
+        "name": "Upah Petik Cabai Panen Ke-1 s/d Ke-15",
+        "qty": "5 Unit/Kg",
+        "unit_price": 4000,
+        "line_total": 20000
+      },
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "7 Unit/Kg",
+        "unit_price": 3500,
+        "line_total": 24500
+      },
+      {
+        "name": "Upah Cabut Lanjaran (Bambu) & Simpan",
+        "qty": "7 Unit/Kg",
+        "unit_price": 92000,
+        "line_total": 644000
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "filename": "assets/synthetic_dataset/receipt_036_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Pengepul Hasil Tani Pak Dadang (Banyuwangi)",
+    "quality_score": 7,
+    "is_original_receipt": false,
+    "reported_total_idr": 856300,
+    "actual_total_idr": 606300,
+    "fraud_flags": [
+      "Total aritmatika nota tidak cocok dengan rincian item"
+    ],
+    "items": [
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 6300
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "6 Unit/Kg",
+        "unit_price": 100000,
+        "line_total": 600000
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "filename": "assets/synthetic_dataset/receipt_037_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Koperasi Tani SukaTani (Garut)",
+    "quality_score": 7,
+    "is_original_receipt": false,
+    "reported_total_idr": 1902000,
+    "actual_total_idr": 1752000,
+    "fraud_flags": [
+      "Total aritmatika nota tidak cocok dengan rincian item"
+    ],
+    "items": [
+      {
+        "name": "Tali Rafia (Ikat Tanaman ke Ajir)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 64000,
+        "line_total": 384000
+      },
+      {
+        "name": "Media Tanam Semai & Tray Semai",
+        "qty": "3 Unit/Kg",
+        "unit_price": 456000,
+        "line_total": 1368000
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "filename": "assets/synthetic_dataset/receipt_038_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Pengepul Bawang Pak Harto (Brebes)",
+    "quality_score": 7,
+    "is_original_receipt": false,
+    "reported_total_idr": 4840700,
+    "actual_total_idr": 4840700,
+    "fraud_flags": [
+      "Foto terdeteksi berasal dari layar laptop/HP (bukan fisik)"
+    ],
+    "items": [
+      {
+        "name": "Bambu Lanjaran (Ajir)",
+        "qty": "1 Unit/Kg",
+        "unit_price": 700,
+        "line_total": 700
+      },
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "8 Unit/Kg",
+        "unit_price": 101000,
+        "line_total": 808000
+      },
+      {
+        "name": "Media Tanam Semai & Tray Semai",
+        "qty": "8 Unit/Kg",
+        "unit_price": 479000,
+        "line_total": 3832000
+      },
+      {
+        "name": "Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)",
+        "qty": "4 Unit/Kg",
+        "unit_price": 50000,
+        "line_total": 200000
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "filename": "assets/synthetic_dataset/receipt_039_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "Pengepul Bawang Pak Harto (Brebes)",
+    "quality_score": 7,
+    "is_original_receipt": false,
+    "reported_total_idr": 1771000,
+    "actual_total_idr": 1721000,
+    "fraud_flags": [
+      "Total aritmatika nota tidak cocok dengan rincian item"
+    ],
+    "items": [
+      {
+        "name": "Pupuk Kalsium (Cegah Rontok Bunga)",
+        "qty": "8 Unit/Kg",
+        "unit_price": 27000,
+        "line_total": 216000
+      },
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 165000,
+        "line_total": 330000
+      },
+      {
+        "name": "Upah Bongkar Mulsa Plastik & Bakar Tanaman",
+        "qty": "10 Unit/Kg",
+        "unit_price": 116000,
+        "line_total": 1160000
+      },
+      {
+        "name": "Karung Jaring Cabai",
+        "qty": "6 Unit/Kg",
+        "unit_price": 2500,
+        "line_total": 15000
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "filename": "assets/synthetic_dataset/receipt_040_fraud.jpg",
+    "category_type": "fraud",
+    "merchant_name": "UD Subur Jaya (Wonosobo)",
+    "quality_score": 5,
+    "is_original_receipt": false,
+    "reported_total_idr": 3512000,
+    "actual_total_idr": 3512000,
+    "fraud_flags": [
+      "Foto terdeteksi berasal dari layar laptop/HP (bukan fisik)"
+    ],
+    "items": [
+      {
+        "name": "Fungisida Antracol (Cegah Patek/Antraknosa)",
+        "qty": "9 Unit/Kg",
+        "unit_price": 166000,
+        "line_total": 1494000
+      },
+      {
+        "name": "Upah Pasang Mulsa & Lubangi",
+        "qty": "7 Unit/Kg",
+        "unit_price": 116000,
+        "line_total": 812000
+      },
+      {
+        "name": "Insektisida Curacron (Kutu/Thrips)",
+        "qty": "2 Unit/Kg",
+        "unit_price": 162000,
+        "line_total": 324000
+      },
+      {
+        "name": "Benih Cabai Merah Hibrida (Kopay/Baja)",
+        "qty": "6 Unit/Kg",
+        "unit_price": 147000,
+        "line_total": 882000
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "filename": "assets/synthetic_dataset/receipt_041_unrelated.jpg",
+    "category_type": "unrelated",
+    "merchant_name": "Bengkel Motor Sinar Jaya",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 60000,
+    "actual_total_idr": 60000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nasi Padang Ayam Pop",
+        "qty": "2 Porsi",
+        "unit_price": 25000,
+        "line_total": 50000
+      },
+      {
+        "name": "Es Teh Manis",
+        "qty": "2 Gelas",
+        "unit_price": 5000,
+        "line_total": 10000
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "filename": "assets/synthetic_dataset/receipt_042_unrelated.jpg",
+    "category_type": "unrelated",
+    "merchant_name": "Restoran Solaria Mall",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 60000,
+    "actual_total_idr": 60000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nasi Padang Ayam Pop",
+        "qty": "2 Porsi",
+        "unit_price": 25000,
+        "line_total": 50000
+      },
+      {
+        "name": "Es Teh Manis",
+        "qty": "2 Gelas",
+        "unit_price": 5000,
+        "line_total": 10000
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "filename": "assets/synthetic_dataset/receipt_043_unrelated.jpg",
+    "category_type": "unrelated",
+    "merchant_name": "Bengkel Motor Sinar Jaya",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 60000,
+    "actual_total_idr": 60000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nasi Padang Ayam Pop",
+        "qty": "2 Porsi",
+        "unit_price": 25000,
+        "line_total": 50000
+      },
+      {
+        "name": "Es Teh Manis",
+        "qty": "2 Gelas",
+        "unit_price": 5000,
+        "line_total": 10000
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "filename": "assets/synthetic_dataset/receipt_044_unrelated.jpg",
+    "category_type": "unrelated",
+    "merchant_name": "Restoran Solaria Mall",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 60000,
+    "actual_total_idr": 60000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nasi Padang Ayam Pop",
+        "qty": "2 Porsi",
+        "unit_price": 25000,
+        "line_total": 50000
+      },
+      {
+        "name": "Es Teh Manis",
+        "qty": "2 Gelas",
+        "unit_price": 5000,
+        "line_total": 10000
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "filename": "assets/synthetic_dataset/receipt_045_unrelated.jpg",
+    "category_type": "unrelated",
+    "merchant_name": "Toko Elektronik Cahaya",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 60000,
+    "actual_total_idr": 60000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Nasi Padang Ayam Pop",
+        "qty": "2 Porsi",
+        "unit_price": 25000,
+        "line_total": 50000
+      },
+      {
+        "name": "Es Teh Manis",
+        "qty": "2 Gelas",
+        "unit_price": 5000,
+        "line_total": 10000
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "filename": "assets/synthetic_dataset/receipt_046_mixed.jpg",
+    "category_type": "mixed",
+    "merchant_name": "Pengepul Bawang Pak Harto (Probolinggo)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 2450000,
+    "actual_total_idr": 2450000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk NPK Mutiara",
+        "qty": "2 Sak",
+        "unit_price": 850000,
+        "line_total": 1700000
+      },
+      {
+        "name": "Upah Buruh Petik",
+        "qty": "2 Orang",
+        "unit_price": 100000,
+        "line_total": 200000
+      },
+      {
+        "name": "Sprayer Hama 16L",
+        "qty": "1 Unit",
+        "unit_price": 550000,
+        "line_total": 550000
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "filename": "assets/synthetic_dataset/receipt_047_mixed.jpg",
+    "category_type": "mixed",
+    "merchant_name": "UD Subur Jaya (Malang)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 2450000,
+    "actual_total_idr": 2450000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk NPK Mutiara",
+        "qty": "2 Sak",
+        "unit_price": 850000,
+        "line_total": 1700000
+      },
+      {
+        "name": "Upah Buruh Petik",
+        "qty": "2 Orang",
+        "unit_price": 100000,
+        "line_total": 200000
+      },
+      {
+        "name": "Sprayer Hama 16L",
+        "qty": "1 Unit",
+        "unit_price": 550000,
+        "line_total": 550000
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "filename": "assets/synthetic_dataset/receipt_048_mixed.jpg",
+    "category_type": "mixed",
+    "merchant_name": "Kelompok Tani Harapan Bersama (Malang)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 2450000,
+    "actual_total_idr": 2450000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk NPK Mutiara",
+        "qty": "2 Sak",
+        "unit_price": 850000,
+        "line_total": 1700000
+      },
+      {
+        "name": "Upah Buruh Petik",
+        "qty": "2 Orang",
+        "unit_price": 100000,
+        "line_total": 200000
+      },
+      {
+        "name": "Sprayer Hama 16L",
+        "qty": "1 Unit",
+        "unit_price": 550000,
+        "line_total": 550000
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "filename": "assets/synthetic_dataset/receipt_049_mixed.jpg",
+    "category_type": "mixed",
+    "merchant_name": "Pengepul Bawang Pak Harto (Tabanan)",
+    "quality_score": 9,
+    "is_original_receipt": true,
+    "reported_total_idr": 2450000,
+    "actual_total_idr": 2450000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk NPK Mutiara",
+        "qty": "2 Sak",
+        "unit_price": 850000,
+        "line_total": 1700000
+      },
+      {
+        "name": "Upah Buruh Petik",
+        "qty": "2 Orang",
+        "unit_price": 100000,
+        "line_total": 200000
+      },
+      {
+        "name": "Sprayer Hama 16L",
+        "qty": "1 Unit",
+        "unit_price": 550000,
+        "line_total": 550000
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "filename": "assets/synthetic_dataset/receipt_050_mixed.jpg",
+    "category_type": "mixed",
+    "merchant_name": "Pengepul Bawang Pak Harto (Wonosobo)",
+    "quality_score": 10,
+    "is_original_receipt": true,
+    "reported_total_idr": 2450000,
+    "actual_total_idr": 2450000,
+    "fraud_flags": [],
+    "items": [
+      {
+        "name": "Pupuk NPK Mutiara",
+        "qty": "2 Sak",
+        "unit_price": 850000,
+        "line_total": 1700000
+      },
+      {
+        "name": "Upah Buruh Petik",
+        "qty": "2 Orang",
+        "unit_price": 100000,
+        "line_total": 200000
+      },
+      {
+        "name": "Sprayer Hama 16L",
+        "qty": "1 Unit",
+        "unit_price": 550000,
+        "line_total": 550000
+      }
+    ]
+  }
+]

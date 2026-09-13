@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   ChevronLeft, Receipt as ReceiptIcon, AlertCircle, ChevronDown,
   ChevronUp, CheckSquare, Square, Trash2, Tag, Check, X,
-  Upload, Layers, Loader2, Sparkles
 } from "lucide-react";
 import { useProtected } from "../lib/use-protected";
 import BottomNav from "../components/BottomNav";
@@ -64,6 +63,9 @@ export default function ReceiptsPage() {
   const [ledger, setLedger] = useState<LedgerItem[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
 
+  // NEW: Initial Fetching Loading State
+  const [isLoadingReceipts, setIsLoadingReceipts] = useState(true);
+
   // Bulk selection state
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -72,12 +74,23 @@ export default function ReceiptsPage() {
   const [notification, setNotification] = useState<string | null>(null);
 
   const loadReceipts = async () => {
-    const data = await fetchAllReceipts(user?.id);
-    setLedger(data);
+    try {
+      // Ensure loading is true before fetch (important if user changes)
+      if (!isLoadingReceipts) setIsLoadingReceipts(true);
+      const data = await fetchAllReceipts(user?.id);
+      setLedger(data);
+    } catch (error) {
+      console.error("Failed to load receipts", error);
+    } finally {
+      // NEW: Set loading to false regardless of success or failure
+      setIsLoadingReceipts(false);
+    }
   };
 
   useEffect(() => {
-    loadReceipts();
+    if (user?.id) {
+      loadReceipts();
+    }
   }, [user]);
 
   const toggleSelect = (id: string) => {
@@ -98,7 +111,9 @@ export default function ReceiptsPage() {
     if (selectedIds.length === 0) return;
     setActionLoading(true);
     await bulkUpdateLedgerReceipts(selectedIds, { primary_category: newCategory });
-    await loadReceipts();
+    // Reload data silently without showing whole-page splash
+    const updatedData = await fetchAllReceipts(user?.id);
+    setLedger(updatedData);
     setActionLoading(false);
     setShowCategoryModal(false);
     setNotification(`Updated category for ${selectedIds.length} receipts to "${newCategory}"`);
@@ -113,7 +128,9 @@ export default function ReceiptsPage() {
 
     setActionLoading(true);
     await bulkDeleteLedgerReceipts(selectedIds);
-    await loadReceipts();
+    // Reload data silently
+    const updatedData = await fetchAllReceipts(user?.id);
+    setLedger(updatedData);
     setActionLoading(false);
     setNotification(`Deleted ${selectedIds.length} receipts.`);
     setSelectedIds([]);
@@ -130,7 +147,11 @@ export default function ReceiptsPage() {
     .reduce((s, r) => s + (r.total_production_cost || 0), 0);
 
   return (
+<<<<<<< Updated upstream
     <div className="min-h-screen bg-slate-50 max-w-md mx-auto pb-32 font-sans relative">
+=======
+    <div className="min-h-screen bg-slate-50 w-full max-w-md mx-auto pb-32 font-sans relative">
+>>>>>>> Stashed changes
       {/* Header */}
       <header className="bg-white border-b border-slate-100 px-5 pt-12 pb-4 sticky top-0 z-20">
         <div className="flex items-center justify-between mb-3">
@@ -138,7 +159,7 @@ export default function ReceiptsPage() {
             <ChevronLeft size={22} />
             <span className="text-sm font-semibold">Home</span>
           </button>
-          {ledger.length > 0 && (
+          {!isLoadingReceipts && ledger.length > 0 && (
             <button
               onClick={() => {
                 setSelectMode(!selectMode);
@@ -165,8 +186,17 @@ export default function ReceiptsPage() {
           </div>
           <div className="text-right">
             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Total Expenses</p>
+<<<<<<< Updated upstream
             <p className="font-black text-slate-900 text-sm">Rp {totalExpenses.toLocaleString("en-US")}</p>
             <p className="text-[10px] text-emerald-600 font-bold">{ledger.length} items · +Rp {totalReward.toLocaleString("en-US")}</p>
+=======
+            <p className="font-black text-slate-900 text-sm">
+              Rp {isLoadingReceipts ? "..." : totalExpenses.toLocaleString("en-US")}
+            </p>
+            {!isLoadingReceipts && (
+              <p className="text-[10px] text-emerald-600 font-bold">{ledger.length} items · +Rp {totalReward.toLocaleString("en-US")}</p>
+            )}
+>>>>>>> Stashed changes
           </div>
         </div>
 
@@ -198,7 +228,26 @@ export default function ReceiptsPage() {
       )}
 
       <main className="px-4 pt-4 space-y-6">
+<<<<<<< Updated upstream
         {ledger.length === 0 ? (
+=======
+        {/* MODIFIED: Check loading state first */}
+        {isLoadingReceipts ? (
+          // NEW: Loading Splash Screen inside main content area
+          <div className="flex flex-col items-center justify-center py-20 space-y-4 animate-pulse">
+            <div className="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center border border-slate-200 relative overflow-hidden">
+              <ReceiptIcon size={32} className="text-slate-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent -translate-x-full animate-shimmer"></div>
+            </div>
+            <div className="space-y-2 flex flex-col items-center">
+              <div className="h-4 w-40 bg-slate-200 rounded-md"></div>
+              <div className="h-3 w-60 bg-slate-100 rounded-md"></div>
+            </div>
+            <p className="font-bold text-slate-500 text-sm pt-2">Fetching your uploaded receipts...</p>
+          </div>
+        ) : ledger.length === 0 ? (
+          // Empty State
+>>>>>>> Stashed changes
           <div className="flex flex-col items-center justify-center py-20 space-y-3">
             <div className="w-16 h-16 bg-slate-100 rounded-3xl flex items-center justify-center">
               <ReceiptIcon size={32} className="text-slate-400" />
@@ -215,6 +264,7 @@ export default function ReceiptsPage() {
             </button>
           </div>
         ) : (
+          // List State
           Object.entries(grouped).map(([month, rows]) => {
             const monthTotal = rows.reduce((s, r) => s + (r.reward_earned || 0), 0);
             const monthCost = rows.reduce((s, r) => s + (r.total_production_cost || 0), 0);
@@ -332,7 +382,7 @@ export default function ReceiptsPage() {
       </main>
 
       {/* Floating Bulk Action Bar */}
-      {selectMode && selectedIds.length > 0 && (
+      {!isLoadingReceipts && selectMode && selectedIds.length > 0 && (
         <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40">
           <div className="bg-slate-900 text-white rounded-2xl p-3.5 shadow-2xl border border-slate-700 flex items-center justify-between">
             <div>

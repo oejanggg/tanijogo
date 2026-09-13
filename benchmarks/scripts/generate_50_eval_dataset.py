@@ -21,23 +21,106 @@ MERCHANTS_UNRELATED = [
     "Bengkel Motor Sinar Jaya", "Restoran Solaria Mall", "Minimarket Indomaret"
 ]
 
+# FARM_ITEMS_POOL = [
+#     ("Cabai Merah Keriting", "COGS", 32000, 45000),
+#     ("Cabai Rawit Merah", "COGS", 40000, 65000),
+#     ("Bawang Merah Grade A", "COGS", 25000, 38000),
+#     ("Bawang Putih Honan", "COGS", 30000, 42000),
+#     ("Jagung Pipil Kering", "COGS", 5000, 8500),
+#     ("Gabah Kering Giling", "COGS", 6500, 8000),
+#     ("Pupuk NPK Mutiara 16-16-16", "COGS", 750000, 900000),
+#     ("Pupuk Urea Subsidil", "COGS", 130000, 180000),
+#     ("Bibit Cabai F1 Hibrida", "COGS", 110000, 140000),
+#     ("Fungisida & Insektisida", "COGS", 85000, 150000),
+#     ("Upah Buruh Petik Panen", "OPEX", 90000, 120000),
+#     ("Sewa Keranjang & Transport", "OPEX", 120000, 200000),
+#     ("Solar Genset Irigasi", "OPEX", 10000, 15000),
+#     ("Sewa Traktor Garap Lahan", "OPEX", 350000, 600000),
+#     ("Pompa Air Alkon 3 Inch", "CAPEX", 2200000, 3500000),
+#     ("Sprayer Hama Elektrik 16L", "CAPEX", 450000, 750000),
+# ]
+
 FARM_ITEMS_POOL = [
-    ("Cabai Merah Keriting", "COGS", 32000, 45000),
-    ("Cabai Rawit Merah", "COGS", 40000, 65000),
-    ("Bawang Merah Grade A", "COGS", 25000, 38000),
-    ("Bawang Putih Honan", "COGS", 30000, 42000),
-    ("Jagung Pipil Kering", "COGS", 5000, 8500),
-    ("Gabah Kering Giling", "COGS", 6500, 8000),
-    ("Pupuk NPK Mutiara 16-16-16", "COGS", 750000, 900000),
-    ("Pupuk Urea Subsidil", "COGS", 130000, 180000),
-    ("Bibit Cabai F1 Hibrida", "COGS", 110000, 140000),
-    ("Fungisida & Insektisida", "COGS", 85000, 150000),
-    ("Upah Buruh Petik Panen", "OPEX", 90000, 120000),
-    ("Sewa Keranjang & Transport", "OPEX", 120000, 200000),
-    ("Solar Genset Irigasi", "OPEX", 10000, 15000),
-    ("Sewa Traktor Garap Lahan", "OPEX", 350000, 600000),
-    ("Pompa Air Alkon 3 Inch", "CAPEX", 2200000, 3500000),
-    ("Sprayer Hama Elektrik 16L", "CAPEX", 450000, 750000),
+    # ==========================================
+    # # SIKLUS TANAM PADI (Usia 100-115 Hari)
+    # # ==========================================
+    # # -- 1. Buka Lahan & Persiapan --
+    # ("Sewa Traktor Roda 4 (Bajak & Garu)", "OPEX", 1500000, 2000000),
+    # ("BBM Solar Traktor", "OPEX", 6800, 10000),
+    # ("Upah Cangkul Perbaiki Pematang (Galengan)", "OPEX", 90000, 120000),
+    # # -- 2. Pembibitan & Tanam --
+    # ("Benih Padi Inpari 32 Bersertifikat", "COGS", 15000, 20000),
+    # ("Upah Cabut Bibit (Naut)", "OPEX", 70000, 100000),
+    # ("Upah Tanam Padi (Tandur) Borongan", "OPEX", 1200000, 1500000),
+    # # -- 3. Perawatan (Pupuk & Obat) --
+    # ("Pupuk Urea Bersubsidi (Pemupukan 1 & 2)", "COGS", 2250, 2600),
+    # ("Pupuk NPK Phonska (Pemupukan 1 & 2)", "COGS", 2300, 2800),
+    # ("Upah Matun (Cabut Rumput)", "OPEX", 75000, 100000),
+    # ("Insektisida Regent 50 SC (Anti Wereng)", "COGS", 55000, 75000),
+    # ("Fungisida Amistar Top (Pencegah Potong Leher)", "COGS", 120000, 150000),
+    # ("Tagihan Listrik / Solar Pompa Air Air Irigasi", "OPEX", 250000, 400000),
+    # # -- 4. Panen & Penjualan --
+    # ("Karung Plastik Kosong 50kg", "OPEX", 2000, 3000),
+    # ("Sewa Mesin Combine Harvester (Potong & Perontok)", "OPEX", 2000000, 3000000),
+    # ("Ongkos Angkut (Ojek Gabah ke Jalan Raya)", "OPEX", 10000, 15000),
+    # ("Nota Tengkulak: Jual GKP (Gabah Kering Panen)", "REVENUE", 6500, 7800),
+    # # -- 5. Pembersihan Lahan --
+    # ("Bakteri Dekomposer Jerami (EM4)", "COGS", 25000, 35000),
+    # ("Upah Babat & Bakar Sisa Jerami", "OPEX", 90000, 120000),
+
+    # # ==========================================
+    # # SIKLUS TANAM JAGUNG (Usia 100-110 Hari)
+    # # ==========================================
+    # # -- 1. Buka Lahan --
+    # ("Herbisida Gramoxone (Bakar Rumput Awal)", "COGS", 80000, 110000),
+    # ("Sewa Traktor Rotary (Gembur Tanah)", "OPEX", 1200000, 1800000),
+    # # -- 2. Pembibitan & Tanam --
+    # ("Benih Jagung Hibrida BISI 18", "COGS", 110000, 140000),
+    # ("Insektisida Perlakuan Benih (Gaucho)", "COGS", 35000, 50000),
+    # ("Upah Tugal/Gejlok Tanam Jagung", "OPEX", 80000, 110000),
+    # # -- 3. Perawatan --
+    # ("Pupuk Urea (Fase Vegetatif)", "COGS", 2250, 2600),
+    # ("Pupuk NPK Mutiara 16-16-16", "COGS", 15000, 19000),
+    # ("Insektisida Prevathon (Basmi Ulat Grayak FAW)", "COGS", 135000, 160000),
+    # ("Upah Semprot Pestisida (3x Aplikasi)", "OPEX", 85000, 120000),
+    # ("Upah Dangir / Kocor Pupuk", "OPEX", 80000, 110000),
+    # # -- 4. Panen & Penjualan --
+    # ("Upah Petik & Kupas Jagung di Sawah", "OPEX", 90000, 120000),
+    # ("Sewa Mesin Pemipil (Sheller) + Solar", "OPEX", 200, 350),
+    # ("Karung Mesh / Waring Jagung", "OPEX", 3000, 4500),
+    # ("Nota Pabrik: Jual Jagung Pipil Basah", "REVENUE", 4200, 5500),
+    # # -- 5. Pembersihan Lahan --
+    # ("Upah Tebas Batang / Tebon Jagung", "OPEX", 90000, 120000),
+    # ("Penjualan Limbah Tebon Jagung (Pakan Ternak)", "REVENUE", 500000, 800000),
+
+    # ==========================================
+    # SIKLUS TANAM CABAI MERAH (Usia 150-180 Hari)
+    # ==========================================
+    # -- 1. Buka Lahan --
+    ("Sewa Traktor & Pembuatan Bedengan", "OPEX", 2500000, 3500000),
+    ("Kapur Pertanian (Dolomit) Netralisir pH", "COGS", 800, 1500),
+    ("Pupuk Kandang Ayam Fermentasi", "COGS", 20000, 35000),
+    ("Plastik Mulsa Hitam Perak", "COGS", 450000, 600000),
+    ("Upah Pasang Mulsa & Lubangi", "OPEX", 90000, 120000),
+    # -- 2. Pembibitan & Tanam --
+    ("Benih Cabai Merah Hibrida (Kopay/Baja)", "COGS", 140000, 180000),
+    ("Media Tanam Semai & Tray Semai", "COGS", 350000, 500000),
+    ("Upah Pindah Tanam Bibit", "OPEX", 80000, 110000),
+    ("Bambu Lanjaran (Ajir)", "CAPEX", 700, 1200),
+    ("Tali Rafia (Ikat Tanaman ke Ajir)", "OPEX", 45000, 65000),
+    # -- 3. Perawatan --
+    ("Pupuk NPK Mutiara (Sistem Kocor)", "COGS", 15000, 19000),
+    ("Pupuk Kalsium (Cegah Rontok Bunga)", "COGS", 25000, 40000),
+    ("Fungisida Antracol (Cegah Patek/Antraknosa)", "COGS", 140000, 180000),
+    ("Insektisida Curacron (Kutu/Thrips)", "COGS", 160000, 200000),
+    ("Upah Pekerja Perawatan Rutin (Kocor/Semprot)", "OPEX", 90000, 130000),
+    # -- 4. Panen --
+    ("Upah Petik Cabai Panen Ke-1 s/d Ke-15", "OPEX", 3000, 5000),
+    ("Karung Jaring Cabai", "OPEX", 2500, 4000),
+    ("Nota Tengkulak: Jual Cabai Merah Keriting (Harga Rata-rata)", "REVENUE", 32000, 55000),
+    # -- 5. Pembersihan Lahan --
+    ("Upah Cabut Lanjaran (Bambu) & Simpan", "OPEX", 90000, 120000),
+    ("Upah Bongkar Mulsa Plastik & Bakar Tanaman", "OPEX", 90000, 120000)
 ]
 
 
