@@ -43,8 +43,8 @@ def generate_farmer_script(
     farmer_name: str = "Pak Joko"
 ) -> str:
     """
-    Generates a natural, assertive Indonesian spoken negotiation brief for Pak Joko.
-    Tailored for ElevenLabs spoken audio synthesis.
+    Generates a warm, natural, conversational Indonesian spoken negotiation brief for Pak Joko.
+    Tailored for ElevenLabs spoken audio synthesis with authentic human phrasing.
     """
     merchant = evaluation.merchant_name or "Pengepul Tani"
     score = evaluation.image_quality_score
@@ -54,10 +54,10 @@ def generate_farmer_script(
     if not evaluation.is_original_receipt or evaluation.primary_receipt_category == "INVALID":
         flags_text = ", ".join(evaluation.fraud_flags) if evaluation.fraud_flags else "Nota tidak sesuai standar"
         return (
-            f"Perhatian {farmer_name}! Audit nota dari {merchant} mendeteksi indikasi masalah. "
-            f"Penyebab utama: {flags_text}. "
-            f"Insentif tunai otomatis adalah {payout_str}. "
-            f"Minta pengepul hitung ulang total nota Anda sebelum pembayaran diselesaikan!"
+            f"Perhatian {farmer_name}! Audit nota dari {merchant} mendeteksi ada masalah nih. "
+            f"Penyebab utamanya: {flags_text}. "
+            f"Insentif tunai otomatis belum bisa cair dan tercatat {payout_str}. "
+            f"Minta pengepul hitung ulang total nota Anda ya Pak sebelum pembayaran diselesaikan!"
         )
 
     hpp = hpp_financials.get("hpp_per_kg", 0)
@@ -67,12 +67,12 @@ def generate_farmer_script(
     hpp_str = format_idr_speech(hpp)
 
     script = (
-        f"Halo {farmer_name}, audit nota dari {merchant} selesai! "
-        f"Kejelasan foto nota bernilai {score} dari 10. "
-        f"Anda mendapatkan insentif tunai sebesar {payout_str}. "
-        f"Total biaya produksi panen ini tercatat {cost_str}. "
-        f"Target harga jual break-even Ha Pe Pe Anda adalah {hpp_str} per kilo. "
-        f"Jangan jual di bawah harga Ha Pe Pe agar tidak rugi. Sukses panennya!"
+        f"Halo {farmer_name}! Audit nota dari {merchant} sudah beres nih. "
+        f"Kejelasan foto notanya dapet nilai {score} dari 10. Mantap! "
+        f"Insentif tunai Anda langsung cair sebesar {payout_str}. "
+        f"Total biaya produksi panen kali ini tercatat {cost_str}. "
+        f"Biar nggak rugi, patokan harga jual break-even Ha Pe Pe Bapak itu {hpp_str} per kilo ya. "
+        f"Jangan mau jual di bawah harga Ha Pe Pe. Semangat dan sukses panennya Pak!"
     )
     return script
 
@@ -88,7 +88,8 @@ def synthesize_audio_brief(
     """
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not voice_id:
-        voice_id = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")  # Default Rachel / Multilingual
+        # Default: Antoni (ErXwobaYiN019PkySvjV) - Warm conversational expressive male voice
+        voice_id = os.getenv("ELEVENLABS_VOICE_ID", "ErXwobaYiN019PkySvjV")
 
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
 
@@ -110,9 +111,11 @@ def synthesize_audio_brief(
         "text": script_text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.45,
-            "similarity_boost": 0.8,
-            "speed": 1.15
+            "stability": 0.35,
+            "similarity_boost": 0.85,
+            "style": 0.25,
+            "use_speaker_boost": True,
+            "speed": 1.05
         }
     }
 
