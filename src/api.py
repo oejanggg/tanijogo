@@ -36,6 +36,9 @@ os.makedirs(AUDIO_DIR, exist_ok=True)
 app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
 
 
+AUDITED_IMAGE_HASHES = set()
+
+
 @app.get("/")
 async def root():
     return {
@@ -48,18 +51,33 @@ async def root():
 @app.post("/audit")
 @app.post("/api/v1/audit")
 async def audit_receipt_file(file: UploadFile = File(...)):
-    """Audits an uploaded receipt image: OCR + HPP + Reward + ElevenLabs Voice Brief + Supabase Logging."""
+    """Audits an uploaded receipt image: OCR + Duplicate Check + HPP + Reward + ElevenLabs Voice Brief + Supabase Logging."""
     original_filename = file.filename or "receipt.jpg"
     temp_path = os.path.join(UPLOAD_DIR, original_filename)
 
     try:
+        content_bytes = await file.read()
         with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(content_bytes)
+
+        # Calculate Image Hash for Duplicate Detection
+        import hashlib
+        image_hash = hashlib.sha256(content_bytes).hexdigest()
 
         # Step 1: Gemini Vision OCR Audit
         evaluation = analyze_receipt(temp_path)
 
-        # Step 2: HPP & Micro-Cash Reward Calculation
+        # Step 2: Check for Duplicate Receipt Submission
+        is_duplicate = image_hash in AUDITED_IMAGE_HASHES
+        if is_duplicate:
+            evaluation.is_original_receipt = False
+            evaluation.primary_receipt_category = "INVALID"
+            if "Terdeteksi Duplikasi: Nota ini sudah pernah di-scan sebelumnya" not in evaluation.fraud_flags:
+                evaluation.fraud_flags.append("Terdeteksi Duplikasi: Nota ini sudah pernah di-scan sebelumnya")
+        else:
+            AUDITED_IMAGE_HASHES.add(image_hash)
+
+        # Step 3: HPP & Micro-Cash Reward Calculation
         payout = calculate_reward(evaluation)
         estimated_yield = 1500.0  # Kg
         financials = calculate_hpp(evaluation, estimated_yield_kg=estimated_yield)
