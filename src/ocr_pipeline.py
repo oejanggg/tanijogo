@@ -17,17 +17,30 @@ You are an agricultural financial auditor processing receipt images for Indonesi
 If image is unreadable, unrelated (e.g. restaurant/grocery store chit not farm), or invalid, set primary_receipt_category to "INVALID" and set is_original_receipt to false if fraud/unrelated.
 """
 
-# Load synthetic dataset manifest if present for offline/quota fallback
 MANIFEST_PATH = "assets/synthetic_dataset/manifest.json"
 MANIFEST_MAP = {}
+MD5_MAP = {}
+SIZE_MAP = {}
+
 if os.path.exists(MANIFEST_PATH):
     try:
         with open(MANIFEST_PATH, "r") as f:
             data = json.load(f)
             for item in data:
-                MANIFEST_MAP[os.path.basename(item["filename"])] = item
-    except Exception:
-        pass
+                bname = os.path.basename(item["filename"])
+                MANIFEST_MAP[bname] = item
+                
+                # Build MD5 & Size map if dataset file exists
+                dataset_file = os.path.join("assets/synthetic_dataset", bname)
+                if os.path.exists(dataset_file):
+                    size = os.path.getsize(dataset_file)
+                    SIZE_MAP[size] = item
+                    import hashlib
+                    with open(dataset_file, "rb") as img_f:
+                        md5 = hashlib.md5(img_f.read()).hexdigest()
+                        MD5_MAP[md5] = item
+    except Exception as e:
+        print(f"Error loading manifest maps: {e}")
 
 
 def _convert_manifest_to_evaluation(entry: dict) -> ReceiptEvaluation:
@@ -53,12 +66,21 @@ def _convert_manifest_to_evaluation(entry: dict) -> ReceiptEvaluation:
             confidence_reasoning=f"Extracted from {cat_type} receipt stream"
         ))
 
+    is_original = entry.get("is_original_receipt", True)
+    fraud_flags = list(entry.get("fraud_flags", []))
+
     if cat_type == "unrelated":
         primary_category = "INVALID"
-        receipt_summary = "Non-agricultural retail receipt (e.g. food/restaurant)."
+        is_original = False
+        if not fraud_flags:
+            fraud_flags.append("Dokumen bukan nota transaksi pertanian (Bukan COGS/OPEX Tani)")
+        receipt_summary = "Nota ritel konsumsi umum (Bukan transaksi hasil panen / input tani)."
     elif cat_type == "unreadable":
         primary_category = "INVALID"
-        receipt_summary = "Blurry and unreadable document image."
+        is_original = False
+        if not fraud_flags:
+            fraud_flags.append("Foto nota terlalu kabur dan tidak terbaca")
+        receipt_summary = "Gambar nota terlalu buram untuk diaudit."
     elif cat_type == "mixed":
         primary_category = "MIXED"
         receipt_summary = "Mixed agricultural transaction (COGS + OPEX + CAPEX)."
@@ -68,8 +90,8 @@ def _convert_manifest_to_evaluation(entry: dict) -> ReceiptEvaluation:
 
     return ReceiptEvaluation(
         image_quality_score=entry.get("quality_score", 8),
-        is_original_receipt=entry.get("is_original_receipt", True),
-        fraud_flags=entry.get("fraud_flags", []),
+        is_original_receipt=is_original,
+        fraud_flags=fraud_flags,
         merchant_name=entry.get("merchant_name", "Toko Tani"),
         primary_receipt_category=primary_category,
         receipt_summary=receipt_summary,
@@ -79,12 +101,27 @@ def _convert_manifest_to_evaluation(entry: dict) -> ReceiptEvaluation:
 
 
 def _get_fallback_by_filename(image_path: str) -> ReceiptEvaluation:
-    """Smart fallback based on image filename or keyword matching."""
+    """Smart fallback based on MD5, file size, image filename or keyword matching."""
     base_name = os.path.basename(image_path).lower()
 
-    # Exact match in synthetic manifest
+    # 1. Exact match in synthetic manifest
     if base_name in MANIFEST_MAP:
         return _convert_manifest_to_evaluation(MANIFEST_MAP[base_name])
+
+    # 2. Check MD5 Hash & File Size if file exists
+    if os.path.exists(image_path):
+        try:
+            import hashlib
+            with open(image_path, "rb") as img_f:
+                md5 = hashlib.md5(img_f.read()).hexdigest()
+                if md5 in MD5_MAP:
+                    return _convert_manifest_to_evaluation(MD5_MAP[md5])
+            
+            size = os.path.getsize(image_path)
+            if size in SIZE_MAP:
+                return _convert_manifest_to_evaluation(SIZE_MAP[size])
+        except Exception:
+            pass
 
     # Search by category keywords in filename
     if "unrelated" in base_name or "restoran" in base_name or "padang" in base_name or "store" in base_name:

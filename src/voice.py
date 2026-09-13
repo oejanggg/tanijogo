@@ -4,6 +4,26 @@ from typing import Dict, Any, Optional
 from src.schemas import ReceiptEvaluation
 
 
+def format_idr_speech(amount: int) -> str:
+    """Formats numeric amounts into natural spoken Indonesian for ElevenLabs TTS."""
+    if amount <= 0:
+        return "nol rupiah"
+    if amount >= 1_000_000:
+        juta = amount / 1_000_000
+        if juta == int(juta):
+            return f"{int(juta)} juta rupiah"
+        return f"{juta:.1f}".replace('.', ',') + " juta rupiah"
+    if amount >= 1000:
+        ribu = amount // 1000
+        sisa = amount % 1000
+        if sisa == 0:
+            return f"{ribu} ribu rupiah"
+        # Format with dot separator for Indonesian standard
+        formatted_num = f"{amount:,}".replace(',', '.')
+        return f"{formatted_num} rupiah"
+    return f"{amount} rupiah"
+
+
 def generate_farmer_script(
     evaluation: ReceiptEvaluation,
     payout_idr: int,
@@ -17,27 +37,33 @@ def generate_farmer_script(
     merchant = evaluation.merchant_name or "Pengepul Tani"
     score = evaluation.image_quality_score
 
+    payout_str = format_idr_speech(payout_idr)
+
     if not evaluation.is_original_receipt or evaluation.primary_receipt_category == "INVALID":
         flags_text = ", ".join(evaluation.fraud_flags) if evaluation.fraud_flags else "Nota tidak sesuai standar"
         return (
             f"Perhatian {farmer_name}! Audit nota dari {merchant} mendeteksi indikasi masalah. "
             f"Penyebab utama: {flags_text}. "
-            f"Insentif tunai otomatis adalah nol rupiah. "
+            f"Insentif tunai otomatis adalah {payout_str}. "
             f"Minta pengepul hitung ulang total nota Anda sebelum pembayaran diselesaikan!"
         )
 
     hpp = hpp_financials.get("hpp_per_kg", 0)
     total_cost = hpp_financials.get("total_production_cost", 0)
 
+    cost_str = format_idr_speech(total_cost)
+    hpp_str = format_idr_speech(hpp)
+
     script = (
         f"Halo {farmer_name}, audit nota dari {merchant} selesai! "
         f"Kejelasan foto nota bernilai {score} dari 10. "
-        f"Anda mendapatkan insentif tunai sebesar Rp {payout_idr:,}. "
-        f"Total biaya produksi panen ini tercatat Rp {total_cost:,}. "
-        f"Target harga jual break-even HPP Anda adalah Rp {hpp:,} per kilo. "
-        f"Jangan jual di bawah harga HPP agar tidak rugi. Sukses panennya!"
+        f"Anda mendapatkan insentif tunai sebesar {payout_str}. "
+        f"Total biaya produksi panen ini tercatat {cost_str}. "
+        f"Target harga jual break-even H.P.P. Anda adalah {hpp_str} per kilo. "
+        f"Jangan jual di bawah harga H.P.P. agar tidak rugi. Sukses panennya!"
     )
     return script
+
 
 
 def synthesize_audio_brief(
