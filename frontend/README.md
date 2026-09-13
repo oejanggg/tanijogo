@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaniJaga Frontend 📱
+**Farmer's Cost Ledger – Mobile-First Web Application**
 
-## Getting Started
+Built with **Next.js 16 (App Router)**, **React 19**, and **Tailwind CSS**, the TaniJaga frontend is an accessible, mobile-first progressive web application engineered specifically for rural smallholder farmers.
 
-First, run the development server:
+---
+
+## 🌾 Features & Pages
+
+| Route | Page | Purpose & Functionality |
+|---|---|---|
+| `/` | **Landing / Splash** | Welcome screen, value proposition, and redirection to login or home. |
+| `/login` & `/signup` | **Authentication** | Supabase Auth email signup, profile creation, and session persistence. |
+| `/home` | **Dashboard** | Micro-incentive wallet balance, audio briefing playback, commodity toggle (Corn, Chili, Rice), real-time BEP card with Bapenas benchmark comparison, and receipt camera/upload modal. |
+| `/verdict` | **AI Audit Result** | Displays extracted line items, merchant name, image quality score (1-10), cash reward earned, and audio briefing player. |
+| `/confirm` | **Manual Review** | Large high-contrast touch keypad allowing farmers to review and adjust line items or expense categories. |
+| `/receipts` | **Farmer's Ledger** | Chronological expense ledger with voice transcript dropdowns, category badges, and batch image audit upload. |
+| `/harvest` | **Harvest Calculator** | Interactive seasonal yield & price modeling, computing farmer-specific BEP/kg for Corn, Chili, and Rice. |
+| `/report` | **KUR Bank Credit Report** | Financial statement recap, gross revenue vs. operational costs, supplier breakdown, and printable bank underwriting report. |
+
+---
+
+## ⚙️ Environment Configuration
+
+Create a `.env.local` file inside the `frontend/` directory (or copy from `.env.example`):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Python FastAPI Backend URL
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> **Note**: For production deployments (e.g. Netlify), set `NEXT_PUBLIC_API_URL` to your production backend URL (e.g., `https://api.tanijaga.com`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Local Development
 
-## Learn More
+```bash
+# Navigate to frontend directory
+cd frontend
 
-To learn more about Next.js, take a look at the following resources:
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start development server
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000) in your browser (or use mobile device simulation in DevTools).
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🏗️ Production Build & Verification
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Check TypeScript types and generate production bundle
+npm run build
+
+# Start production server locally
+npm run start
+```
+
+### Static Exports & Netlify Deployment
+The frontend is configured to build seamlessly for static edge delivery and Netlify hosting:
+- Build settings are configured via `frontend/netlify.toml` and root `netlify.toml`.
+- API rewrites and Single Page Application routing redirects are handled via `public/_redirects`.
