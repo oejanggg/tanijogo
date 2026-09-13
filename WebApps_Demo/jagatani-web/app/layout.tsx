@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "./lib/auth-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -8,8 +9,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "SukaTani – AI Audit & Insentif Petani Indonesia",
-  description: "Platform keuangan berbasis AI untuk petani Indonesia. Audit nota, hitung HPP, dan cairkan insentif otomatis.",
+  title: "SukaTani – AI Farm Financial Engine",
+  description: "AI-powered incentive & financial audit platform for Indonesian smallholder farmers.",
 };
 
 export const viewport: Viewport = {
@@ -20,8 +21,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-slate-50">{children}</body>
+    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-slate-50">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

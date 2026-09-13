@@ -4,94 +4,66 @@ from typing import Dict, Any, Optional
 from src.schemas import ReceiptEvaluation
 
 
-def terbilang(n: int) -> str:
-    """Recursively converts an integer to Indonesian spoken words with natural breath pauses."""
-    if n <= 0:
-        return "nol"
-    
-    units = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"]
-    
-    def _convert(x: int) -> str:
-        if x < 12:
-            return units[x]
-        elif x < 20:
-            return _convert(x - 10) + " belas"
-        elif x < 100:
-            rem = _convert(x % 10)
-            return (_convert(x // 10) + " puluh " + (rem if rem else "")).strip()
-        elif x < 200:
-            rem = _convert(x - 100)
-            return ("seratus " + (rem if rem else "")).strip()
-        elif x < 1000:
-            rem = _convert(x % 100)
-            return (_convert(x // 100) + " ratus " + (rem if rem else "")).strip()
-        elif x < 2000:
-            rem = _convert(x - 1000)
-            return ("seribu " + (rem if rem else "")).strip()
-        elif x < 1000000:
-            ribu_part = _convert(x // 1000)
-            sisa_part = _convert(x % 1000)
-            if sisa_part:
-                return f"{ribu_part} ribu, {sisa_part}"
-            return f"{ribu_part} ribu"
-        elif x < 1000000000:
-            juta_part = _convert(x // 1000000)
-            sisa_part = _convert(x % 1000000)
-            if sisa_part:
-                return f"{juta_part} juta, {sisa_part}"
-            return f"{juta_part} juta"
-        return str(x)
-
-    res = _convert(n)
-    return " ".join(res.split())
-
-
-def format_idr_speech(amount: int) -> str:
-    """Formats numeric amounts into crystal-clear spoken Indonesian text for ElevenLabs TTS."""
+def format_idr_english(amount: int) -> str:
+    """Formats IDR amounts into natural English spoken words for ElevenLabs TTS."""
     if amount <= 0:
-        return "nol rupiah"
-    return f"{terbilang(amount)} rupiah"
+        return "zero rupiah"
+    if amount >= 1_000_000_000:
+        val = amount / 1_000_000_000
+        s = f"{val:.1f}".rstrip("0").rstrip(".")
+        return f"{s} billion rupiah"
+    elif amount >= 1_000_000:
+        val = amount / 1_000_000
+        s = f"{val:.1f}".rstrip("0").rstrip(".")
+        return f"{s} million rupiah"
+    elif amount >= 1_000:
+        val = amount / 1_000
+        s = f"{val:.1f}".rstrip("0").rstrip(".")
+        return f"{s} thousand rupiah"
+    else:
+        return f"{amount} rupiah"
 
 
 def generate_farmer_script(
     evaluation: ReceiptEvaluation,
     payout_idr: int,
     hpp_financials: Dict[str, Any],
-    farmer_name: str = "Pak Joko"
+    farmer_name: str = "Farmer"
 ) -> str:
     """
-    Generates a warm, natural, conversational Indonesian spoken negotiation brief for Pak Joko.
-    Tailored for ElevenLabs spoken audio synthesis with expressive punctuation.
+    Generates a warm, natural English audio brief for the farmer.
+    Tailored for ElevenLabs TTS with expressive punctuation and pacing.
     """
-    merchant = evaluation.merchant_name or "Pengepul Tani"
+    merchant = evaluation.merchant_name or "the farm supplier"
     score = evaluation.image_quality_score
-
-    payout_str = format_idr_speech(payout_idr)
+    payout_str = format_idr_english(payout_idr)
 
     if not evaluation.is_original_receipt or evaluation.primary_receipt_category == "INVALID":
-        flags_text = ", ".join(evaluation.fraud_flags) if evaluation.fraud_flags else "Nota tidak sesuai standar"
+        flags_text = ", ".join(evaluation.fraud_flags) if evaluation.fraud_flags else "Receipt does not meet audit standards"
         return (
-            f"Perhatian {farmer_name}! Audit nota dari {merchant} mendeteksi ada masalah, nih! "
-            f"Penyebab utamanya: {flags_text}. "
-            f"Insentif tunai otomatis belum bisa cair, dan tercatat {payout_str}. "
-            f"Minta pengepul hitung ulang total nota Anda, ya Pak, sebelum pembayaran diselesaikan!"
+            f"Attention, {farmer_name}! "
+            f"Your receipt from {merchant} has been flagged by our AI audit system. "
+            f"The reason is: {flags_text}. "
+            f"No incentive payment has been made for this submission. "
+            f"Please retake the photo with better lighting, or use a different receipt. "
+            f"Contact support if you need help."
         )
 
     hpp = hpp_financials.get("hpp_per_kg", 0)
     total_cost = hpp_financials.get("total_production_cost", 0)
+    cost_str = format_idr_english(total_cost)
+    hpp_str = format_idr_english(hpp)
 
-    cost_str = format_idr_speech(total_cost)
-    hpp_str = format_idr_speech(hpp)
-
-    script = (
-        f"Halo {farmer_name}! Audit nota dari {merchant} sudah beres, nih! "
-        f"Kejelasan foto notanya dapet nilai {score} dari 10. Mantap! "
-        f"Insentif tunai Anda langsung cair, sebesar {payout_str}. "
-        f"Total biaya produksi panen kali ini, tercatat {cost_str}. "
-        f"Biar tidak rugi, patokan harga jual break-even Ha-Pe-Pe Bapak itu {hpp_str} per kilo, ya. "
-        f"Jangan mau jual di bawah harga Ha-Pe-Pe! Semangat, dan sukses panennya, Pak!"
+    return (
+        f"Great news, {farmer_name}! "
+        f"Your receipt from {merchant} has been verified by SukaTani AI. "
+        f"Image quality score: {score} out of 10. "
+        f"Your cash incentive of {payout_str} has been credited to your wallet. "
+        f"Total production cost recorded: {cost_str}. "
+        f"Your break-even price is {hpp_str} per kilogram. "
+        f"Do not sell below this price, or you will lose money. "
+        f"Great work! Keep uploading your receipts to build your KUR credit report."
     )
-    return script
 
 
 def synthesize_audio_brief(
@@ -100,12 +72,12 @@ def synthesize_audio_brief(
     voice_id: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Synthesizes Indonesian audio using ElevenLabs Turbo V2.5 TTS API.
+    Synthesizes English audio using ElevenLabs Turbo V2.5 TTS API.
     Saves MP3 file to output_filename.
     """
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not voice_id:
-        # Default: George (JBFqnCBsd6RMkjVDRZzb) - Natural, warm, conversational male voice
+        # George (JBFqnCBsd6RMkjVDRZzb) - Natural, warm, conversational male voice
         voice_id = os.getenv("ELEVENLABS_VOICE_ID", "JBFqnCBsd6RMkjVDRZzb")
 
     os.makedirs(os.path.dirname(output_filename), exist_ok=True)
@@ -117,7 +89,6 @@ def synthesize_audio_brief(
             "reason": "ELEVENLABS_API_KEY not configured in .env."
         }
 
-    # Direct ElevenLabs HTTP REST API call for 100% reliability
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
     headers = {
         "Accept": "audio/mpeg",
@@ -129,18 +100,17 @@ def synthesize_audio_brief(
         "text": script_text,
         "model_id": model_id,
         "voice_settings": {
-            "stability": 0.35,
+            "stability": 0.40,
             "similarity_boost": 0.85,
-            "style": 0.20,
+            "style": 0.15,
             "use_speaker_boost": True,
-            "speed": 1.15
+            "speed": 1.10
         }
     }
 
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=15)
         if response.status_code != 200 and model_id == "eleven_turbo_v2_5":
-            # Fallback to eleven_multilingual_v2 if turbo model returns error
             payload["model_id"] = "eleven_multilingual_v2"
             response = requests.post(url, json=payload, headers=headers, timeout=15)
 
