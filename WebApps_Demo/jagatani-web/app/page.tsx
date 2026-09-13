@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Upload, Wallet, AlertTriangle, CheckCircle2, Receipt, Volume2 } from 'lucide-react';
+import { Upload, Wallet, AlertTriangle, CheckCircle2, Receipt, Volume2, Camera, Image as ImageIcon } from 'lucide-react';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [ledger, setLedger] = useState<any[]>([]);
@@ -34,12 +35,19 @@ export default function Home() {
     }
   };
 
-  const handleUpload = async () => {
-    if (!file) return;
+  const handleFileChange = (selectedFile: File | null) => {
+    if (!selectedFile) return;
+    setFile(selectedFile);
+    setPreviewUrl(URL.createObjectURL(selectedFile));
+  };
+
+  const handleUpload = async (fileToUpload?: File) => {
+    const activeFile = fileToUpload || file;
+    if (!activeFile) return;
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', activeFile);
 
     try {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -58,6 +66,7 @@ export default function Home() {
       const data = await res.json();
       setResult(data);
       setFile(null); // Clear selected file for fresh upload
+      setPreviewUrl(null);
 
       const rec = data.transaction_record || data.evaluation;
       const fin = data.financials || {};
@@ -104,29 +113,68 @@ export default function Home() {
 
       <main className="max-w-md mx-auto p-4 mt-4 space-y-6">
         
-        {/* Upload Section */}
-        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-          <h2 className="font-semibold text-lg mb-4">Upload Farm Receipt</h2>
-          <label className="border-2 border-dashed border-emerald-300 bg-emerald-50 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-100 transition-colors">
-            <Upload size={32} className="text-emerald-600 mb-2" />
-            <span className="text-sm font-medium text-emerald-800">
-              {file ? file.name : 'Tap to scan nota'}
-            </span>
-            <input 
-              type="file" 
-              accept="image/*" 
-              capture="environment"
-              className="hidden" 
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
-          </label>
+        {/* Upload & Photo Scan Section */}
+        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center space-y-4">
+          <h2 className="font-bold text-lg text-gray-800">Audit & Scan Farm Receipt</h2>
+
+          {previewUrl ? (
+            <div className="relative rounded-xl overflow-hidden border-2 border-emerald-500 bg-black/5 p-2 space-y-2">
+              <img src={previewUrl} alt="Receipt preview" className="max-h-48 w-full object-contain rounded-lg mx-auto" />
+              <div className="flex justify-between items-center px-2">
+                <span className="text-xs text-emerald-800 font-semibold truncate max-w-[200px]">{file?.name}</span>
+                <button
+                  onClick={() => { setFile(null); setPreviewUrl(null); }}
+                  className="text-xs text-red-600 font-bold underline"
+                >
+                  Ulangi / Reset
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {/* Direct Camera Capture Button */}
+              <label className="border-2 border-dashed border-emerald-400 bg-emerald-50 hover:bg-emerald-100 rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer transition-colors space-y-2">
+                <div className="p-3 bg-emerald-600 text-white rounded-full shadow-md">
+                  <Camera size={24} />
+                </div>
+                <span className="text-xs font-bold text-emerald-900">Foto Nota (Kamera)</span>
+                <span className="text-[10px] text-emerald-600">Ambil foto langsung</span>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  capture="environment"
+                  className="hidden" 
+                  onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+                />
+              </label>
+
+              {/* Upload File / Gallery Button */}
+              <label className="border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer transition-colors space-y-2">
+                <div className="p-3 bg-gray-700 text-white rounded-full shadow-md">
+                  <ImageIcon size={24} />
+                </div>
+                <span className="text-xs font-bold text-gray-800">Pilih File / Galeri</span>
+                <span className="text-[10px] text-gray-500">Upload dari hp</span>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+                />
+              </label>
+            </div>
+          )}
 
           <button
-            onClick={handleUpload}
+            onClick={() => handleUpload()}
             disabled={!file || loading}
-            className="w-full mt-4 bg-emerald-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-colors"
+            className="w-full mt-2 bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-base hover:bg-emerald-700 disabled:bg-gray-300 transition-colors shadow-sm flex items-center justify-center space-x-2"
           >
-            {loading ? 'Analyzing Receipt...' : 'Submit & Earn'}
+            {loading ? (
+              <span>Sedang Menganalisis Nota...</span>
+            ) : (
+              <span>⚡ Audit Nota & Cairkan Insentif</span>
+            )}
           </button>
         </section>
 
