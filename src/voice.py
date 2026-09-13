@@ -129,10 +129,11 @@ def synthesize_audio_brief(
         "text": script_text,
         "model_id": model_id,
         "voice_settings": {
-            "stability": 0.38,
+            "stability": 0.35,
             "similarity_boost": 0.85,
-            "style": 0.35,
-            "use_speaker_boost": True
+            "style": 0.20,
+            "use_speaker_boost": True,
+            "speed": 1.15
         }
     }
 
