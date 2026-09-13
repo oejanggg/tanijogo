@@ -5,35 +5,52 @@ from src.schemas import ReceiptEvaluation
 
 
 def terbilang(n: int) -> str:
-    """Recursively converts an integer to Indonesian spoken words."""
-    if n == 0:
-        return ""
-    satuan = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"]
-    if n < 12:
-        return satuan[n]
-    elif n < 20:
-        return terbilang(n - 10) + " belas"
-    elif n < 100:
-        return (terbilang(n // 10) + " puluh " + terbilang(n % 10)).strip()
-    elif n < 200:
-        return ("seratus " + terbilang(n - 100)).strip()
-    elif n < 1000:
-        return (terbilang(n // 100) + " ratus " + terbilang(n % 100)).strip()
-    elif n < 2000:
-        return ("seribu " + terbilang(n - 1000)).strip()
-    elif n < 1000000:
-        return (terbilang(n // 1000) + " ribu " + terbilang(n % 1000)).strip()
-    elif n < 1000000000:
-        return (terbilang(n // 1000000) + " juta " + terbilang(n % 1000000)).strip()
-    return str(n)
+    """Recursively converts an integer to Indonesian spoken words with natural breath pauses."""
+    if n <= 0:
+        return "nol"
+    
+    units = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"]
+    
+    def _convert(x: int) -> str:
+        if x < 12:
+            return units[x]
+        elif x < 20:
+            return _convert(x - 10) + " belas"
+        elif x < 100:
+            rem = _convert(x % 10)
+            return (_convert(x // 10) + " puluh " + (rem if rem else "")).strip()
+        elif x < 200:
+            rem = _convert(x - 100)
+            return ("seratus " + (rem if rem else "")).strip()
+        elif x < 1000:
+            rem = _convert(x % 100)
+            return (_convert(x // 100) + " ratus " + (rem if rem else "")).strip()
+        elif x < 2000:
+            rem = _convert(x - 1000)
+            return ("seribu " + (rem if rem else "")).strip()
+        elif x < 1000000:
+            ribu_part = _convert(x // 1000)
+            sisa_part = _convert(x % 1000)
+            if sisa_part:
+                return f"{ribu_part} ribu, {sisa_part}"
+            return f"{ribu_part} ribu"
+        elif x < 1000000000:
+            juta_part = _convert(x // 1000000)
+            sisa_part = _convert(x % 1000000)
+            if sisa_part:
+                return f"{juta_part} juta, {sisa_part}"
+            return f"{juta_part} juta"
+        return str(x)
+
+    res = _convert(n)
+    return " ".join(res.split())
 
 
 def format_idr_speech(amount: int) -> str:
     """Formats numeric amounts into crystal-clear spoken Indonesian text for ElevenLabs TTS."""
     if amount <= 0:
         return "nol rupiah"
-    words = " ".join(terbilang(amount).split())
-    return f"{words} rupiah"
+    return f"{terbilang(amount)} rupiah"
 
 
 def generate_farmer_script(
@@ -44,7 +61,7 @@ def generate_farmer_script(
 ) -> str:
     """
     Generates a warm, natural, conversational Indonesian spoken negotiation brief for Pak Joko.
-    Tailored for ElevenLabs spoken audio synthesis with authentic human phrasing.
+    Tailored for ElevenLabs spoken audio synthesis with expressive punctuation.
     """
     merchant = evaluation.merchant_name or "Pengepul Tani"
     score = evaluation.image_quality_score
@@ -54,10 +71,10 @@ def generate_farmer_script(
     if not evaluation.is_original_receipt or evaluation.primary_receipt_category == "INVALID":
         flags_text = ", ".join(evaluation.fraud_flags) if evaluation.fraud_flags else "Nota tidak sesuai standar"
         return (
-            f"Perhatian {farmer_name}! Audit nota dari {merchant} mendeteksi ada masalah nih. "
+            f"Perhatian {farmer_name}! Audit nota dari {merchant} mendeteksi ada masalah, nih! "
             f"Penyebab utamanya: {flags_text}. "
-            f"Insentif tunai otomatis belum bisa cair dan tercatat {payout_str}. "
-            f"Minta pengepul hitung ulang total nota Anda ya Pak sebelum pembayaran diselesaikan!"
+            f"Insentif tunai otomatis belum bisa cair, dan tercatat {payout_str}. "
+            f"Minta pengepul hitung ulang total nota Anda, ya Pak, sebelum pembayaran diselesaikan!"
         )
 
     hpp = hpp_financials.get("hpp_per_kg", 0)
@@ -67,12 +84,12 @@ def generate_farmer_script(
     hpp_str = format_idr_speech(hpp)
 
     script = (
-        f"Halo {farmer_name}! Audit nota dari {merchant} sudah beres nih. "
+        f"Halo {farmer_name}! Audit nota dari {merchant} sudah beres, nih! "
         f"Kejelasan foto notanya dapet nilai {score} dari 10. Mantap! "
-        f"Insentif tunai Anda langsung cair sebesar {payout_str}. "
-        f"Total biaya produksi panen kali ini tercatat {cost_str}. "
-        f"Biar nggak rugi, patokan harga jual break-even Ha-Pe-Pe Bapak itu {hpp_str} per kilo ya. "
-        f"Jangan mau jual di bawah harga Ha-Pe-Pe. Semangat dan sukses panennya Pak!"
+        f"Insentif tunai Anda langsung cair, sebesar {payout_str}. "
+        f"Total biaya produksi panen kali ini, tercatat {cost_str}. "
+        f"Biar tidak rugi, patokan harga jual break-even Ha-Pe-Pe Bapak itu {hpp_str} per kilo, ya. "
+        f"Jangan mau jual di bawah harga Ha-Pe-Pe! Semangat, dan sukses panennya, Pak!"
     )
     return script
 
@@ -112,9 +129,9 @@ def synthesize_audio_brief(
         "text": script_text,
         "model_id": model_id,
         "voice_settings": {
-            "stability": 0.35,
+            "stability": 0.38,
             "similarity_boost": 0.85,
-            "style": 0.20,
+            "style": 0.35,
             "use_speaker_boost": True
         }
     }
