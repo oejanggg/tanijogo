@@ -38,10 +38,17 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // 1. Create auth user
+    // 1. Create auth user with dynamic confirmation redirect
+    const redirectUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/email-confirmed`
+      : undefined;
+
     const { data: authData, error: signUpError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
     });
 
     if (signUpError) {
