@@ -1,0 +1,10 @@
+python-dotenv
+pydantic
+google-genai
+supabase
+<<<<<<< HEAD
+Pillow
+=======
+Pillow
+elevenlabs
+>>>>>>> 3e67d120773498afe7bd9e1841822493d44b0682
