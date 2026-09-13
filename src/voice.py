@@ -4,24 +4,36 @@ from typing import Dict, Any, Optional
 from src.schemas import ReceiptEvaluation
 
 
+def terbilang(n: int) -> str:
+    """Recursively converts an integer to Indonesian spoken words."""
+    if n == 0:
+        return ""
+    satuan = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"]
+    if n < 12:
+        return satuan[n]
+    elif n < 20:
+        return terbilang(n - 10) + " belas"
+    elif n < 100:
+        return (terbilang(n // 10) + " puluh " + terbilang(n % 10)).strip()
+    elif n < 200:
+        return ("seratus " + terbilang(n - 100)).strip()
+    elif n < 1000:
+        return (terbilang(n // 100) + " ratus " + terbilang(n % 100)).strip()
+    elif n < 2000:
+        return ("seribu " + terbilang(n - 1000)).strip()
+    elif n < 1000000:
+        return (terbilang(n // 1000) + " ribu " + terbilang(n % 1000)).strip()
+    elif n < 1000000000:
+        return (terbilang(n // 1000000) + " juta " + terbilang(n % 1000000)).strip()
+    return str(n)
+
+
 def format_idr_speech(amount: int) -> str:
-    """Formats numeric amounts into natural spoken Indonesian for ElevenLabs TTS."""
+    """Formats numeric amounts into crystal-clear spoken Indonesian text for ElevenLabs TTS."""
     if amount <= 0:
         return "nol rupiah"
-    if amount >= 1_000_000:
-        juta = amount / 1_000_000
-        if juta == int(juta):
-            return f"{int(juta)} juta rupiah"
-        return f"{juta:.1f}".replace('.', ',') + " juta rupiah"
-    if amount >= 1000:
-        ribu = amount // 1000
-        sisa = amount % 1000
-        if sisa == 0:
-            return f"{ribu} ribu rupiah"
-        # Format with dot separator for Indonesian standard
-        formatted_num = f"{amount:,}".replace(',', '.')
-        return f"{formatted_num} rupiah"
-    return f"{amount} rupiah"
+    words = " ".join(terbilang(amount).split())
+    return f"{words} rupiah"
 
 
 def generate_farmer_script(
@@ -65,7 +77,6 @@ def generate_farmer_script(
     return script
 
 
-
 def synthesize_audio_brief(
     script_text: str,
     output_filename: str = "assets/audio_briefs/brief.mp3",
@@ -99,8 +110,9 @@ def synthesize_audio_brief(
         "text": script_text,
         "model_id": "eleven_multilingual_v2",
         "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.75
+            "stability": 0.45,
+            "similarity_boost": 0.8,
+            "speed": 1.15
         }
     }
 
