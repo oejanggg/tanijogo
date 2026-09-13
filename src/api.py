@@ -1,6 +1,5 @@
 import os
 import shutil
-import tempfile
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -27,6 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+UPLOAD_DIR = "assets/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 @app.get("/")
 async def root():
@@ -41,13 +43,13 @@ async def root():
 @app.post("/api/v1/audit")
 async def audit_receipt_file(file: UploadFile = File(...)):
     """Audits an uploaded receipt image: OCR + HPP + Reward + ElevenLabs Voice Brief + Supabase Logging."""
-    # Create temp file
-    suffix = os.path.splitext(file.filename or "temp.jpg")[1] or ".jpg"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-        temp_path = temp_file.name
-        shutil.copyfileobj(file.file, temp_file)
+    original_filename = file.filename or "receipt.jpg"
+    temp_path = os.path.join(UPLOAD_DIR, original_filename)
 
     try:
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
         # Step 1: Gemini Vision OCR Audit
         evaluation = analyze_receipt(temp_path)
 
@@ -66,7 +68,7 @@ async def audit_receipt_file(file: UploadFile = File(...)):
 
         # Step 4: ElevenLabs Spoken Indonesian Voice Brief
         script = generate_farmer_script(evaluation, payout_idr=payout, hpp_financials=financials)
-        voice_res = synthesize_audio_brief(script, output_filename=f"assets/audio_briefs/{file.filename}_brief.mp3")
+        voice_res = synthesize_audio_brief(script, output_filename=f"assets/audio_briefs/{original_filename}_brief.mp3")
 
         # Response payload matching both WebApps_Demo frontend and API contracts
         return {
@@ -86,7 +88,10 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if os.path.exists(temp_path):
-            os.remove(temp_path)
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
 
 
 @app.get("/api/v1/ledger")
