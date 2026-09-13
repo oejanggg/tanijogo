@@ -1,5 +1,6 @@
 import os
 import shutil
+from typing import List
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -7,6 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from src.schemas import ReceiptEvaluation
 from src.ocr_pipeline import analyze_receipt
 from src.financial_engine import calculate_reward, calculate_hpp
 from src.db import save_receipt_evaluation, get_supabase_client
@@ -18,10 +20,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for Next.js web application
+# Production-ready configurable CORS origins
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()] or ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,6 +64,16 @@ async def root():
     }
 
 
+@app.get("/health")
+async def health_check():
+    """Production health check endpoint for container orchestrators and load balancers."""
+    return {
+        "status": "healthy",
+        "version": "1.0.0",
+        "storage": "ok" if os.path.exists(UPLOAD_DIR) and os.path.exists(AUDIO_DIR) else "degraded"
+    }
+
+
 @app.post("/audit")
 @app.post("/api/v1/audit")
 async def audit_receipt_file(file: UploadFile = File(...)):
@@ -86,8 +101,8 @@ async def audit_receipt_file(file: UploadFile = File(...)):
         if is_image_duplicate or is_content_duplicate:
             evaluation.is_original_receipt = False
             evaluation.primary_receipt_category = "INVALID"
-            reason = "Foto nota sudah pernah di-scan sebelumnya" if is_image_duplicate else "Detail isi transaksi nota ini sudah pernah dicatat di sistem"
-            flag_msg = f"Terdeteksi Duplikasi: {reason}"
+            reason = "Receipt image was already submitted previously" if is_image_duplicate else "Identical transaction details already recorded in system"
+            flag_msg = f"Duplicate Detected: {reason}"
             if flag_msg not in evaluation.fraud_flags:
                 evaluation.fraud_flags.append(flag_msg)
         else:
