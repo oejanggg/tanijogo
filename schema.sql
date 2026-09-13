@@ -40,17 +40,35 @@ CREATE TABLE IF NOT EXISTS line_items (
     confidence_reasoning TEXT
 );
 
--- 4. Indexes for Fast Analytics Queries
+-- 4. Create Farmer Ledger Table (Frontend UI Transaction Log)
+CREATE TABLE IF NOT EXISTS farmer_ledger (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    merchant_name TEXT NOT NULL,
+    primary_category TEXT DEFAULT 'MIXED',
+    quality_score INT DEFAULT 8,
+    reward_earned BIGINT DEFAULT 0,
+    total_production_cost BIGINT DEFAULT 0,
+    hpp_per_kg BIGINT DEFAULT 0,
+    fraud_detected BOOLEAN DEFAULT FALSE
+);
+
+-- 5. Indexes for Fast Analytics Queries
 CREATE INDEX IF NOT EXISTS idx_line_items_receipt_id ON line_items(receipt_id);
 CREATE INDEX IF NOT EXISTS idx_line_items_classification ON line_items(classification);
 CREATE INDEX IF NOT EXISTS idx_receipts_created_at ON receipts(created_at);
+CREATE INDEX IF NOT EXISTS idx_farmer_ledger_created_at ON farmer_ledger(created_at);
 
--- 5. Enable Row Level Security (RLS) & Grant Access to Anon / Service Keys
+-- 6. Enable Row Level Security (RLS) & Grant Access to Anon / Service Keys
 ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE line_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE farmer_ledger ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public receipts access" ON receipts;
 CREATE POLICY "Public receipts access" ON receipts FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public line_items access" ON line_items;
 CREATE POLICY "Public line_items access" ON line_items FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public farmer_ledger access" ON farmer_ledger;
+CREATE POLICY "Public farmer_ledger access" ON farmer_ledger FOR ALL USING (true) WITH CHECK (true);

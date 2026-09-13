@@ -4,3 +4,7 @@ google-genai
 supabase
 Pillow
 elevenlabs
+fastapi
+uvicorn
+python-multipart
+pandas

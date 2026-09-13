@@ -6,8 +6,8 @@ from src.schemas import ReceiptEvaluation
 
 def get_supabase_client() -> Optional[Client]:
     """Initializes and returns Supabase client if URL and KEY are set."""
-    url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_KEY")
+    url = os.getenv("SUPABASE_URL") or os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 
     if not url or not key or "your-project" in url:
         return None
@@ -18,9 +18,11 @@ def get_supabase_client() -> Optional[Client]:
 def save_receipt_evaluation(
     evaluation: ReceiptEvaluation,
     payout_idr: int,
-    image_url: Optional[str] = None
+    image_url: Optional[str] = None,
+    total_production_cost_idr: int = 0,
+    hpp_per_kg_idr: int = 0
 ) -> Dict[str, Any]:
-    """Saves evaluated receipt and line items directly into Supabase tables."""
+    """Saves evaluated receipt and line items directly into Supabase tables (receipts, line_items, farmer_ledger)."""
     client = get_supabase_client()
     if not client:
         return {"status": "skipped", "reason": "Supabase credentials incomplete"}
@@ -62,6 +64,21 @@ def save_receipt_evaluation(
         if line_items_payload:
             client.table("line_items").insert(line_items_payload).execute()
 
+        # 3. Sync to farmer_ledger table for Frontend UI compatibility
+        try:
+            ledger_payload = {
+                "merchant_name": evaluation.merchant_name,
+                "primary_category": evaluation.primary_receipt_category,
+                "quality_score": evaluation.image_quality_score,
+                "reward_earned": payout_idr,
+                "total_production_cost": total_production_cost_idr,
+                "hpp_per_kg": hpp_per_kg_idr,
+                "fraud_detected": not evaluation.is_original_receipt
+            }
+            client.table("farmer_ledger").insert(ledger_payload).execute()
+        except Exception:
+            pass  # Non-blocking if farmer_ledger table not created yet
+
         return {
             "status": "success",
             "receipt_id": receipt_id,
@@ -73,6 +90,6 @@ def save_receipt_evaluation(
         if "PGRST205" in err_msg or "receipts" in err_msg:
             return {
                 "status": "pending_schema",
-                "reason": "Supabase connected! Please run schema.sql in Supabase SQL Editor to create the 'receipts' table."
+                "reason": "Supabase connected! Please run schema.sql in Supabase SQL Editor to create tables."
             }
         return {"status": "error", "reason": err_msg}
