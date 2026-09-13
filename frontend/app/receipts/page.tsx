@@ -13,6 +13,7 @@ import {
   fetchAllReceipts,
   bulkUpdateLedgerReceipts,
   bulkDeleteLedgerReceipts,
+  clearAllReceipts,
   LedgerItem
 } from "../lib/ledger-storage";
 
@@ -130,6 +131,18 @@ export default function ReceiptsPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
+  const handleResetAll = async () => {
+    if (!window.confirm("Are you sure you want to reset and delete ALL records from this account?")) return;
+    setActionLoading(true);
+    await clearAllReceipts(user?.id);
+    await loadReceipts();
+    setActionLoading(false);
+    setNotification("All receipts have been reset.");
+    setSelectedIds([]);
+    setSelectMode(false);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const totalExpenses = ledger.reduce((s, r) => s + (r.total_production_cost || 0), 0);
   const totalReward = ledger.reduce((s, r) => s + (r.reward_earned || 0), 0);
   const grouped = groupByMonth(ledger);
@@ -148,19 +161,29 @@ export default function ReceiptsPage() {
             <span className="text-sm font-semibold">Home</span>
           </button>
           {ledger.length > 0 && (
-            <button
-              onClick={() => {
-                setSelectMode(!selectMode);
-                setSelectedIds([]);
-              }}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                selectMode
-                  ? "bg-slate-900 text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              {selectMode ? "Cancel Select" : "Bulk Update"}
-            </button>
+            <div className="flex items-center space-x-1.5">
+              <button
+                onClick={handleResetAll}
+                className="px-2.5 py-1 rounded-xl text-xs font-bold transition-all text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/60 flex items-center space-x-1"
+                title="Reset all receipts"
+              >
+                <Trash2 size={12} />
+                <span>Reset All</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectMode(!selectMode);
+                  setSelectedIds([]);
+                }}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                  selectMode
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {selectMode ? "Cancel Select" : "Bulk Update"}
+              </button>
+            </div>
           )}
         </div>
 

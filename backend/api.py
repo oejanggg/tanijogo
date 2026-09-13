@@ -95,6 +95,18 @@ async def health_check():
     }
 
 
+@app.post("/api/v1/ledger/reset")
+@app.post("/ledger/reset")
+async def reset_ledger_cache():
+    """Resets audited image hashes and content fingerprints for demo/testing."""
+    AUDITED_IMAGE_HASHES.clear()
+    AUDITED_CONTENT_FINGERPRINTS.clear()
+    return {
+        "status": "success",
+        "message": "Audited duplicate hash cache successfully reset."
+    }
+
+
 @app.post("/audit")
 @app.post("/api/v1/audit")
 async def audit_receipt_file(file: UploadFile = File(...)):
@@ -180,6 +192,8 @@ async def audit_receipt_file(file: UploadFile = File(...)):
 
 @app.post("/batch-audit")
 @app.post("/api/v1/batch-audit")
+@app.post("/audit-batch")
+@app.post("/api/v1/audit-batch")
 async def audit_receipts_batch(files: List[UploadFile] = File(...)):
     """Audits multiple uploaded receipt images: OCR + Duplicate Check + Micro-Rewards + Aggregated Corn HPP + Batch Voice Brief."""
     if not files:
