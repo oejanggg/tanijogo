@@ -13,7 +13,7 @@
 ## 📌 Project Overview
 Getting smallholder farmers to keep consistent expense records is one of ag-tech's biggest hurdles. **TaniJaga (Farmer's Cost Ledger)** solves this by offering instant micro-cash rewards when farmers snap photos of agricultural receipts right at the farmgate.
 
-In return, **Gemini 2.5 Flash Vision AI** transcribes handwritten Indonesian receipts, detects duplicates and tampering, categorizes expenses (`COGS`, `OPEX`, `CAPEX`), computes the true **Break Even Point (BEP/kg)** across multiple staple crops (**Corn, Chili, Rice**), generates spoken English audio briefings via **ElevenLabs**, and compiles an audit-verified **KUR Bank Credit Report**.
+In return, **Gemini 3.6 Flash** transcribes handwritten Indonesian receipts, detects duplicates and tampering, categorizes expenses (`COGS`, `OPEX`, `CAPEX`), computes the true **Break Even Point (BEP/kg)** across multiple staple crops (**Corn, Chili, Rice**), generates spoken English audio briefings via **ElevenLabs**, and compiles an audit-verified **KUR Bank Credit Report**.
 
 Comprehensive documentation is available in [`docs/comprehensive_guide.md`](file:///Users/rayes/Documents/hackathon/docs/comprehensive_guide.md).
 
@@ -27,7 +27,7 @@ Comprehensive documentation is available in [`docs/comprehensive_guide.md`](file
 - **🌾 Rice (Padi)**: 5,500 kg/ha standard yield | BEP benchmark Rp 4,500/kg | Bapenas market price Rp 6,800/kg
 - User commodity selection is persisted across navigation, ensuring accurate crop-specific yield baselines and calculations.
 
-### 2. Multimodal AI Receipt Audit (Gemini 2.5 Flash)
+### 2. Multimodal AI Receipt Audit (Gemini 3.6 Flash)
 - Transcribes complex handwritten receipts, store stamps, and wrinkled paper.
 - Dual-layer audit checking image quality (1-10), duplicate submissions, and agricultural price anomalies.
 - Categorizes line items into accounting categories (Fertilizer, Seeds, Agrochemicals, Labor, Fuel).
@@ -56,7 +56,7 @@ flowchart TD
     end
 
     subgraph Intelligence["⚡ AI Intelligence API (FastAPI)"]
-        OCR["🔍 Gemini 2.5 Flash Vision<br/>Dual-Layer Duplicate & Fraud Audit"]
+        OCR["🔍 Gemini 3.6 Flash<br/>Dual-Layer Duplicate & Fraud Audit"]
         MATH["📊 Financial Engine<br/>Commodity BEP Calculation & Rewards"]
         TTS["🎙️ ElevenLabs TTS<br/>Spoken English Audio Brief"]
     end
